@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${lesson.title + ' - Player'}">Lesson Player</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <section class="page active" id="page-lesson-player">
+        <div class="page-header">
+            <div>
+                <h2 class="page-title" th:text="${lesson.title}">Lesson</h2>
+                <p class="page-subtitle">Lý thuyết và bài tập</p>
+            </div>
+        </div>
+
+        <section>
+            <h2 class="section-title" style="margin-top:0;">Lý thuyết</h2>
+            <div th:if="${theory != null}" th:utext="${theory.content}">
+                Theory content...
+            </div>
+            <div th:if="${theory == null}">
+                No theory content.
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Bài tập</h2>
+            <div th:if="${exercises == null || #lists.isEmpty(exercises)}">
+                <p>No exercises found.</p>
+            </div>
+
+            <div th:if="${exercises != null}">
+                <div th:each="ex : ${exercises}">
+                    <div class="progress-item" style="margin-bottom:12px;">
+                        <div class="progress-item-header">
+                            <span style="font-weight:800;" th:text="${ex.type}">speaking</span>
+                            <span style="color:var(--text-secondary); font-size:13px;"
+                                  th:text="${ex.audioUrl != null ? 'Có audio' : ''}"></span>
+                        </div>
+                        <p style="color:var(--text-secondary);">Exercise UI will be implemented later.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</div>
+</body>
+</html>
+

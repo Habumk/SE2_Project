@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Learn — Đăng nhập</title>
+    <meta name="description" content="K-Learn - Đăng nhập để bắt đầu học tiếng Hàn">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/dark-mode.css}">
+</head>
+<body>
+
+<div class="auth-screen" id="authScreen" style="display: flex;">
+    <div class="auth-container">
+        <div class="auth-header">
+            <span class="auth-logo">🇰🇷</span>
+            <h1 class="auth-title">K-Learn</h1>
+            <p class="auth-subtitle">Nền tảng học tiếng Hàn trực tuyến</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab" id="authTabLogin"
+                    th:classappend="${activeTab == 'login'} ? ' active'"
+                    onclick="switchAuthTab('login')">Đăng nhập</button>
+            <button class="auth-tab" id="authTabRegister"
+                    th:classappend="${activeTab == 'register'} ? ' active'"
+                    onclick="switchAuthTab('register')">Đăng ký</button>
+        </div>
+
+        <!-- ── UC-01: Login Form (Spring Security formLogin) ─────────────── -->
+        <form class="auth-form" id="loginForm" th:action="@{/auth/login}" method="post"
+              th:style="${activeTab == 'login'} ? 'display:flex' : 'display:none'">
+            <div class="form-group">
+                <label for="loginEmail">Email <span style="color:var(--danger)">*</span></label>
+                <input type="email" id="loginEmail" name="email"
+                       placeholder="email@example.com" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Mật khẩu <span style="color:var(--danger)">*</span></label>
+                <input type="password" id="loginPassword" name="password"
+                       placeholder="Nhập mật khẩu" required
+                       autocomplete="current-password">
+            </div>
+
+            <div class="auth-options">
+                <label class="remember-me">
+                    <input type="checkbox" name="remember-me"> Ghi nhớ đăng nhập
+                </label>
+                <!-- UC-01 A2: Forgot password link -->
+                <a th:href="@{/auth/forgot-password}" class="forgot-link"
+                   style="font-size:13px; color:var(--accent-primary); text-decoration:none;">
+                    Quên mật khẩu?
+                </a>
+            </div>
+
+            <!-- UC-01 E1: Invalid credentials -->
+            <div class="form-error" th:if="${errorMessage}" th:text="${errorMessage}"
+                 style="display:block;"></div>
+
+            <!-- UC-03: Logout success -->
+            <div th:if="${logoutMessage}"
+                 style="color:var(--success); background:var(--success-bg); padding:10px 14px;
+                        border-radius:8px; font-size:14px; margin-bottom:8px;">
+                <span th:text="${logoutMessage}"></span>
+            </div>
+
+            <!-- UC-02 A1: Registration success -->
+            <div th:if="${param.registered}"
+                 style="color:var(--success); background:var(--success-bg); padding:10px 14px;
+                        border-radius:8px; font-size:14px; margin-bottom:8px;">
+                ✅ Registration Successful! Please log in.
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-submit">Đăng nhập</button>
+        </form>
+
+        <!-- ── UC-02: Register Form ──────────────────────────────────────── -->
+        <form class="auth-form" id="registerForm" th:action="@{/auth/register}" method="post"
+              th:object="${registerRequest}"
+              th:style="${activeTab == 'register'} ? 'display:flex' : 'display:none'">
+
+            <div class="form-group">
+                <label for="regName">Họ tên <span style="color:var(--danger)">*</span></label>
+                <input type="text" id="regName" th:field="*{name}"
+                       placeholder="Nguyễn Văn A" required autocomplete="name">
+            </div>
+            <div class="form-group">
+                <label for="regEmail">Email <span style="color:var(--danger)">*</span></label>
+                <input type="email" id="regEmail" th:field="*{email}"
+                       placeholder="email@example.com" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="regPassword">Mật khẩu <span style="color:var(--danger)">*</span></label>
+                <input type="password" id="regPassword" th:field="*{password}"
+                       placeholder="Min 8 ký tự, có chữ hoa + số" required minlength="8"
+                       autocomplete="new-password">
+                <small style="color:var(--text-secondary); font-size:12px;">
+                    Tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường và số.
+                </small>
+            </div>
+            <!-- UC-02: Confirm Password field -->
+            <div class="form-group">
+                <label for="regConfirmPassword">Xác nhận mật khẩu <span style="color:var(--danger)">*</span></label>
+                <input type="password" id="regConfirmPassword" name="confirmPassword"
+                       placeholder="Nhập lại mật khẩu" required minlength="8"
+                       autocomplete="new-password">
+            </div>
+
+            <!-- General register error (E1, E2) -->
+            <div class="form-error" th:if="${registerError}" th:text="${registerError}"
+                 style="display:block;"></div>
+
+            <button type="submit" class="btn btn-primary auth-submit">Tạo tài khoản</button>
+        </form>
+
+        <p class="auth-footer-text">학습의 즐거움을 발견하세요 ✨</p>
+    </div>
+</div>
+
+<script th:src="@{/js/dark-mode.js}"></script>
+<script>
+function switchAuthTab(tab) {
+    document.getElementById('authTabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('authTabRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('loginForm').style.display = tab === 'login' ? 'flex' : 'none';
+    document.getElementById('registerForm').style.display = tab === 'register' ? 'flex' : 'none';
+}
+</script>
+</body>
+</html>

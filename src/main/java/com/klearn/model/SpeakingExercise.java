@@ -1,0 +1,25 @@
+package com.klearn.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "speaking_exercises")
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
+@Builder
+public class SpeakingExercise {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 200)
+    private String kr;
+
+    @Column(nullable = false, length = 200)
+    private String roman;
+
+    @Column(nullable = false, length = 200)
+    private String vi;
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Trang chủ - K-Learn</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">🇰🇷 Chào mừng đến với K-Learn</h1>
+            <p class="hero-subtitle">Nền tảng học tiếng Hàn trực tuyến miễn phí với đầy đủ 4 kỹ năng: Nghe, Nói, Đọc, Viết</p>
+            
+            <div class="hero-actions">
+                <div th:if="${user == null or user.role == 'ROLE_GUEST'}">
+                    <a th:href="@{/auth/register}" class="btn btn-primary btn-large">📝 Bắt đầu học ngay</a>
+                    <a th:href="@{/auth/login}" class="btn btn-secondary btn-large">🔐 Đăng nhập</a>
+                </div>
+                <div th:if="${user != null and user.role != 'ROLE_GUEST'}">
+                    <a th:href="@{/dashboard}" class="btn btn-primary btn-large">📊 Tiếp tục học</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="features-section">
+        <div class="container">
+            <h2 class="section-title">Tính năng nổi bật</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>Giáo trình đầy đủ</h3>
+                    <p>Học theo lộ trình từ cơ bản đến nâng cao với các bài học được thiết kế khoa học</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎧</div>
+                    <h3>Luyện nghe</h3>
+                    <p>Cải thiện kỹ năng nghe với các bài tập đa dạng và audio chất lượng cao</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🗣️</div>
+                    <h3>Luyện nói</h3>
+                    <p>Tập phát âm với công nghệ nhận diện giọng nói và phòng nói chuyện trực tuyến</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📖</div>
+                    <h3>Luyện đọc</h3>
+                    <p>Nâng cao vốn từ và kỹ năng đọc hiểu qua các bài tập và văn bản thực tế</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✍️</div>
+                    <h3>Luyện viết</h3>
+                    <p>Thực hành viết tiếng Hàn với các bài tập từ cơ bản đến nâng cao</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🃏</div>
+                    <h3>Flashcard</h3>
+                    <p>Học từ vựng hiệu quả với hệ thống flashcard thông minh</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <div class="container">
+            <h2 class="section-title">Thống kê học tập</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Bài học</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Từ vựng</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">200+</div>
+                    <div class="stat-label">Bài tập</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">10+</div>
+                    <div class="stat-label">Huy hiệu</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+

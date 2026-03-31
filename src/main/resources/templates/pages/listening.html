@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head><title>Luyện Nghe — K-Learn</title></head>
+<body>
+<div layout:fragment="content">
+<section class="page active" id="page-listening">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Luyện Nghe 듣기</h2>
+            <p class="page-subtitle">Nghe và chọn đáp án đúng</p>
+        </div>
+    </div>
+    <div class="exercise-container">
+        <div class="exercise-progress">
+            <span id="listeningProgress">Câu 1/5</span>
+            <div class="progress-bar"><div class="progress-fill" id="listeningProgressBar" style="width:20%"></div></div>
+        </div>
+        <div class="listening-card">
+            <button class="btn-listen-big" id="listeningPlayBtn" onclick="playListeningAudio()">
+                <span class="listen-icon">🔊</span>
+            </button>
+            <p class="listening-hint" id="listeningHint">Nghe câu và chọn nghĩa đúng</p>
+        </div>
+        <div class="answer-options" id="listeningAnswers"></div>
+        <div class="exercise-result" id="listeningResult" style="display:none;">
+            <div class="result-icon" id="listeningResultIcon">✅</div>
+            <div class="result-text" id="listeningResultText">Chính xác!</div>
+            <div class="result-explanation" id="listeningResultExplanation"></div>
+        </div>
+        <div class="exercise-actions">
+            <button class="btn btn-primary" id="listeningNextBtn" onclick="nextListeningQuestion()" style="display:none;">Câu tiếp theo →</button>
+        </div>
+    </div>
+</section>
+</div>
+</body>
+</html>

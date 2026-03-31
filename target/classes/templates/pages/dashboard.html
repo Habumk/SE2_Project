@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head><title>Dashboard — K-Learn</title></head>
+<body>
+<div layout:fragment="content">
+
+<!-- ==================== DASHBOARD ==================== -->
+<section class="page active" id="page-dashboard">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Xin chào! 안녕하세요! 👋</h2>
+            <p class="page-subtitle">Chào mừng bạn trở lại. Hãy tiếp tục hành trình học tiếng Hàn!</p>
+        </div>
+        <div class="streak-badge" id="streakBadge">
+            <span class="streak-fire">🔥</span>
+            <span class="streak-count" id="streakCount" th:text="${progress != null ? progress.streak : 0}">0</span>
+            <span class="streak-label">ngày liên tục</span>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card stat-card--purple">
+            <div class="stat-icon">📚</div>
+            <div class="stat-info">
+                <span class="stat-value" id="statWordsLearned">0</span>
+                <span class="stat-label">Từ vựng đã học</span>
+            </div>
+        </div>
+        <div class="stat-card stat-card--blue">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <span class="stat-value" id="statLessonsCompleted" th:text="${progress != null ? progress.lessonsCompleted : 0}">0</span>
+                <span class="stat-label">Bài đã hoàn thành</span>
+            </div>
+        </div>
+        <div class="stat-card stat-card--green">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-info">
+                <span class="stat-value" id="statQuizScore">0%</span>
+                <span class="stat-label">Điểm trung bình</span>
+            </div>
+        </div>
+        <div class="stat-card stat-card--orange">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-info">
+                <span class="stat-value" id="statStudyTime">0h</span>
+                <span class="stat-label">Thời gian học</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <h3 class="section-title">Bắt đầu nhanh</h3>
+    <div class="quick-actions">
+        <a th:href="@{/hangul}" class="quick-action-card" style="text-decoration:none; color:inherit;">
+            <div class="qa-icon">🔤</div>
+            <h4>Học Hangul</h4>
+            <p>Bảng chữ cái tiếng Hàn</p>
+        </a>
+        <a th:href="@{/vocabulary}" class="quick-action-card" style="text-decoration:none; color:inherit;">
+            <div class="qa-icon">📚</div>
+            <h4>Từ vựng mới</h4>
+            <p>Học từ theo chủ đề</p>
+        </a>
+        <a th:href="@{/flashcards}" class="quick-action-card" style="text-decoration:none; color:inherit;">
+            <div class="qa-icon">🃏</div>
+            <h4>Flashcards</h4>
+            <p>Ôn tập với thẻ ghi nhớ</p>
+        </a>
+        <a th:href="@{/quiz}" class="quick-action-card" style="text-decoration:none; color:inherit;">
+            <div class="qa-icon">🏆</div>
+            <h4>Kiểm tra</h4>
+            <p>Đánh giá trình độ</p>
+        </a>
+    </div>
+
+    <!-- Daily Word -->
+    <h3 class="section-title">Từ vựng hôm nay</h3>
+    <div class="daily-word-card" id="dailyWordCard">
+        <div class="dw-korean" id="dwKorean">사랑</div>
+        <div class="dw-romanization" id="dwRomanization">sarang</div>
+        <div class="dw-meaning" id="dwMeaning">Tình yêu</div>
+        <button class="btn-speak" onclick="speakKorean(document.getElementById('dwKorean').textContent)"
+                aria-label="Phát âm">
+            🔊
+        </button>
+    </div>
+
+    <!-- Progress Overview -->
+    <h3 class="section-title">Tiến độ học tập</h3>
+    <div class="progress-overview">
+        <div class="progress-item">
+            <div class="progress-item-header">
+                <span>🔤 Hangul</span>
+                <span class="progress-percent" id="progressHangul">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="fillHangul" style="width:0%"></div></div>
+        </div>
+        <div class="progress-item">
+            <div class="progress-item-header">
+                <span>📚 Từ vựng</span>
+                <span class="progress-percent" id="progressVocab">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="fillVocab" style="width:0%"></div></div>
+        </div>
+        <div class="progress-item">
+            <div class="progress-item-header">
+                <span>📝 Ngữ pháp</span>
+                <span class="progress-percent" id="progressGrammar">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="fillGrammar" style="width:0%"></div></div>
+        </div>
+        <div class="progress-item">
+            <div class="progress-item-header">
+                <span>🎧 Nghe</span>
+                <span class="progress-percent" id="progressListening">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="fillListening" style="width:0%"></div></div>
+        </div>
+        <div class="progress-item">
+            <div class="progress-item-header">
+                <span>📖 Đọc</span>
+                <span class="progress-percent" id="progressReading">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="fillReading" style="width:0%"></div></div>
+        </div>
+    </div>
+</section>
+
+</div>
+</body>
+</html>
