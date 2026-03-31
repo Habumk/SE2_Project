@@ -736,8 +736,13 @@
 <!-- ── Navbar ───────────────────────────────────────────── -->
 <nav class="navbar">
   <a href="/" class="navbar-brand">
-    <div class="navbar-logo">한</div>
-    <span class="navbar-name">K<span>-Learn</span></span>
+    <img th:src="@{/images/logo.png}" src="/images/logo.png" alt="K-Learn"
+         style="height:36px;width:auto;object-fit:contain;"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div style="display:none;align-items:center;gap:10px;">
+      <div class="navbar-logo">한</div>
+      <span class="navbar-name">K<span>-Learn</span></span>
+    </div>
   </a>
   <div class="navbar-actions">
     <a th:href="@{/auth/login}" href="/auth/login" class="btn-ghost">Đăng nhập</a>
