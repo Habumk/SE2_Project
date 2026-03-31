@@ -1,134 +1,658 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K-Learn — Đăng nhập</title>
-    <meta name="description" content="K-Learn - Đăng nhập để bắt đầu học tiếng Hàn">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
-          rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-    <link rel="stylesheet" th:href="@{/css/dark-mode.css}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K-Learn — Đăng nhập</title>
+  <meta name="description" content="K-Learn - Đăng nhập để bắt đầu học tiếng Hàn">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       TOKENS
+    ═══════════════════════════════════════════════════════ */
+    :root {
+      --bg:          #F8F9FF;
+      --card:        #FFFFFF;
+      --navy:        #0F172A;
+      --navy-600:    #334155;
+      --coral:       #FF4757;
+      --coral-hover: #E8394A;
+      --muted:       #64748B;
+      --border:      #E2E8F0;
+      --success-bg:  #F0FDF4;
+      --success:     #16A34A;
+      --danger:      #EF4444;
+      --font:        'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+      --font-ko:     'Noto Sans KR', sans-serif;
+      --r-card:      16px;
+      --r-input:     12px;
+      --r-btn:       12px;
+      --shadow-card: 0 20px 60px rgba(15,23,42,0.08), 0 4px 16px rgba(15,23,42,0.04);
+      --t:           all 0.2s ease;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       BASE
+    ═══════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px 48px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; }
+
+    /* ═══════════════════════════════════════════════════════
+       BACKGROUND WATERMARKS — Korean characters
+    ═══════════════════════════════════════════════════════ */
+    body::before, body::after, .bg-extra {
+      font-family: var(--font-ko);
+      font-weight: 900;
+      color: rgba(15,23,42,0.04);
+      position: fixed;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+      line-height: 1;
+    }
+    body::before {
+      content: '한';
+      font-size: clamp(180px, 24vw, 320px);
+      top: -40px; left: -30px;
+      transform: rotate(-15deg);
+    }
+    body::after {
+      content: '국';
+      font-size: clamp(140px, 20vw, 260px);
+      bottom: -20px; right: -20px;
+      transform: rotate(12deg);
+    }
+    .bg-extra {
+      content: '';
+      font-size: clamp(120px, 16vw, 200px);
+      top: 50%; right: 14%;
+      transform: translateY(-50%) rotate(-8deg);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       AUTH CARD
+    ═══════════════════════════════════════════════════════ */
+    .auth-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border-radius: var(--r-card);
+      box-shadow: var(--shadow-card);
+      padding: 36px 32px 28px;
+      animation: cardIn 0.4s ease-out both;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       LOGO AREA
+    ═══════════════════════════════════════════════════════ */
+    .auth-logo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .logo-pill {
+      width: 40px; height: 40px;
+      background: var(--navy);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: #fff;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+    .logo-text-col { display: flex; flex-direction: column; gap: 1px; }
+    .logo-name {
+      font-size: 20px; font-weight: 800;
+      color: var(--navy); letter-spacing: -0.5px; line-height: 1.1;
+    }
+    .logo-name span { color: var(--coral); }
+    .logo-sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-ko);
+      letter-spacing: 0.5px;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       SEGMENTED TAB SWITCHER
+    ═══════════════════════════════════════════════════════ */
+    .tab-switcher {
+      display: flex;
+      background: #F1F5F9;
+      border-radius: 10px;
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 9px 0;
+      border: none; background: transparent;
+      font-family: var(--font);
+      font-size: 14px; font-weight: 600;
+      color: var(--muted);
+      border-radius: 7px;
+      cursor: pointer;
+      transition: var(--t);
+    }
+    .tab-btn.active {
+      background: #fff;
+      color: var(--navy);
+      box-shadow: 0 1px 4px rgba(15,23,42,0.10), 0 1px 2px rgba(15,23,42,0.06);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       SOCIAL LOGIN
+    ═══════════════════════════════════════════════════════ */
+    .social-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .btn-social {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%; height: 44px;
+      border-radius: var(--r-btn);
+      font-family: var(--font);
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      transition: var(--t);
+      border: none;
+    }
+    .btn-google {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      color: var(--navy);
+    }
+    .btn-google:hover { background: #F8F9FF; box-shadow: 0 2px 8px rgba(15,23,42,0.08); }
+    .btn-facebook {
+      background: #1877F2;
+      color: #fff;
+    }
+    .btn-facebook:hover { background: #1668d6; box-shadow: 0 2px 10px rgba(24,119,242,0.30); }
+    .btn-social svg { flex-shrink: 0; }
+
+    /* Divider */
+    .social-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+    }
+    .social-divider::before, .social-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       FORMS
+    ═══════════════════════════════════════════════════════ */
+    .auth-form {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+    .auth-form.visible { display: flex; }
+
+    .form-group { margin-bottom: 14px; }
+    .form-label {
+      display: block;
+      font-size: 13px; font-weight: 600;
+      color: var(--navy-600);
+      margin-bottom: 6px;
+    }
+    .form-label .req { color: var(--coral); margin-left: 2px; }
+
+    /* Input with icon */
+    .input-wrap {
+      position: relative;
+    }
+    .input-icon {
+      position: absolute;
+      left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--muted);
+      display: flex; align-items: center;
+      pointer-events: none;
+    }
+    .form-input {
+      width: 100%; height: 48px;
+      padding: 0 14px 0 42px;
+      background: #FAFBFF;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-input);
+      font-family: var(--font);
+      font-size: 15px; color: var(--navy);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .form-input::placeholder { color: #A0AEC0; }
+    .form-input:focus {
+      border-color: var(--coral);
+      box-shadow: 0 0 0 3px rgba(255,71,87,0.10);
+      background: #fff;
+    }
+    .form-input.no-icon { padding-left: 14px; }
+
+    /* Password hint */
+    .input-hint {
+      font-size: 11.5px; color: var(--muted);
+      margin-top: 5px; line-height: 1.4;
+    }
+
+    /* Remember + forgot row */
+    .auth-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      margin-top: 4px;
+      gap: 8px;
+    }
+    /* Custom toggle switch */
+    .toggle-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--muted);
+      cursor: pointer; user-select: none;
+    }
+    .toggle-input { display: none; }
+    .toggle-track {
+      width: 34px; height: 19px;
+      background: #CBD5E1;
+      border-radius: 99px;
+      position: relative;
+      flex-shrink: 0;
+      transition: background 0.2s ease;
+    }
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      top: 2.5px; left: 2.5px;
+      transition: transform 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .toggle-input:checked + .toggle-track { background: var(--coral); }
+    .toggle-input:checked + .toggle-track::after { transform: translateX(15px); }
+
+    .forgot-link {
+      font-size: 13px; font-weight: 600;
+      color: var(--coral);
+      transition: opacity 0.15s ease;
+      flex-shrink: 0;
+    }
+    .forgot-link:hover { opacity: 0.75; }
+
+    /* Alerts */
+    .form-error {
+      background: #FFF5F5;
+      border: 1px solid #FED7D7;
+      color: var(--danger);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13.5px;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .form-error.visible { display: block; }
+    .alert-success {
+      background: var(--success-bg);
+      border: 1px solid #BBF7D0;
+      color: var(--success);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13.5px;
+      margin-bottom: 14px;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       SUBMIT BUTTON
+    ═══════════════════════════════════════════════════════ */
+    .btn-submit {
+      width: 100%; height: 48px;
+      background: linear-gradient(135deg, #FF4757 0%, #FF6B81 100%);
+      border: none; border-radius: var(--r-btn);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 15px; font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: var(--t);
+      position: relative;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .btn-submit:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(255,71,87,0.35);
+    }
+    .btn-submit:active { transform: translateY(0); filter: brightness(0.98); }
+
+    /* Spinner */
+    .btn-submit .spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-submit.loading .btn-text { display: none; }
+    .btn-submit.loading .spinner { display: block; }
+
+    /* ═══════════════════════════════════════════════════════
+       FOOTER (below card)
+    ═══════════════════════════════════════════════════════ */
+    .auth-footer {
+      position: relative; z-index: 1;
+      margin-top: 22px; text-align: center;
+    }
+    .auth-footer-phrase {
+      font-size: 13px; font-style: italic;
+      color: var(--muted); margin-bottom: 8px;
+      font-family: var(--font-ko);
+    }
+    .auth-footer-cta {
+      font-size: 13px; color: var(--muted);
+    }
+    .auth-footer-cta a {
+      color: var(--coral); font-weight: 600;
+      transition: opacity 0.15s ease;
+    }
+    .auth-footer-cta a:hover { opacity: 0.75; }
+
+    /* ═══════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════ */
+    @media (max-width: 480px) {
+      body { padding: 20px 12px 40px; }
+      .auth-card { padding: 28px 20px 24px; }
+    }
+    @media (max-width: 375px) {
+      .auth-card { padding: 24px 16px 20px; border-radius: 12px; }
+      .logo-name { font-size: 18px; }
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="auth-screen" id="authScreen" style="display: flex;">
-    <div class="auth-container">
-        <div class="auth-header">
-            <span class="auth-logo">🇰🇷</span>
-            <h1 class="auth-title">K-Learn</h1>
-            <p class="auth-subtitle">Nền tảng học tiếng Hàn trực tuyến</p>
-        </div>
+<!-- Background watermark characters -->
+<div class="bg-extra" aria-hidden="true" style="font-family:'Noto Sans KR',sans-serif;font-weight:900;color:rgba(15,23,42,0.035);position:fixed;font-size:clamp(120px,16vw,200px);top:50%;right:14%;transform:translateY(-50%) rotate(-8deg);pointer-events:none;user-select:none;z-index:0;line-height:1;">어</div>
 
-        <div class="auth-tabs">
-            <button class="auth-tab" id="authTabLogin"
-                    th:classappend="${activeTab == 'login'} ? ' active'"
-                    onclick="switchAuthTab('login')">Đăng nhập</button>
-            <button class="auth-tab" id="authTabRegister"
-                    th:classappend="${activeTab == 'register'} ? ' active'"
-                    onclick="switchAuthTab('register')">Đăng ký</button>
-        </div>
+<!-- ── AUTH CARD ──────────────────────────────────────── -->
+<div class="auth-card">
 
-        <!-- ── UC-01: Login Form (Spring Security formLogin) ─────────────── -->
-        <form class="auth-form" id="loginForm" th:action="@{/auth/login}" method="post"
-              th:style="${activeTab == 'login'} ? 'display:flex' : 'display:none'">
-            <div class="form-group">
-                <label for="loginEmail">Email <span style="color:var(--danger)">*</span></label>
-                <input type="email" id="loginEmail" name="email"
-                       placeholder="email@example.com" required autocomplete="email">
-            </div>
-            <div class="form-group">
-                <label for="loginPassword">Mật khẩu <span style="color:var(--danger)">*</span></label>
-                <input type="password" id="loginPassword" name="password"
-                       placeholder="Nhập mật khẩu" required
-                       autocomplete="current-password">
-            </div>
-
-            <div class="auth-options">
-                <label class="remember-me">
-                    <input type="checkbox" name="remember-me"> Ghi nhớ đăng nhập
-                </label>
-                <!-- UC-01 A2: Forgot password link -->
-                <a th:href="@{/auth/forgot-password}" class="forgot-link"
-                   style="font-size:13px; color:var(--accent-primary); text-decoration:none;">
-                    Quên mật khẩu?
-                </a>
-            </div>
-
-            <!-- UC-01 E1: Invalid credentials -->
-            <div class="form-error" th:if="${errorMessage}" th:text="${errorMessage}"
-                 style="display:block;"></div>
-
-            <!-- UC-03: Logout success -->
-            <div th:if="${logoutMessage}"
-                 style="color:var(--success); background:var(--success-bg); padding:10px 14px;
-                        border-radius:8px; font-size:14px; margin-bottom:8px;">
-                <span th:text="${logoutMessage}"></span>
-            </div>
-
-            <!-- UC-02 A1: Registration success -->
-            <div th:if="${param.registered}"
-                 style="color:var(--success); background:var(--success-bg); padding:10px 14px;
-                        border-radius:8px; font-size:14px; margin-bottom:8px;">
-                ✅ Registration Successful! Please log in.
-            </div>
-
-            <button type="submit" class="btn btn-primary auth-submit">Đăng nhập</button>
-        </form>
-
-        <!-- ── UC-02: Register Form ──────────────────────────────────────── -->
-        <form class="auth-form" id="registerForm" th:action="@{/auth/register}" method="post"
-              th:object="${registerRequest}"
-              th:style="${activeTab == 'register'} ? 'display:flex' : 'display:none'">
-
-            <div class="form-group">
-                <label for="regName">Họ tên <span style="color:var(--danger)">*</span></label>
-                <input type="text" id="regName" th:field="*{name}"
-                       placeholder="Nguyễn Văn A" required autocomplete="name">
-            </div>
-            <div class="form-group">
-                <label for="regEmail">Email <span style="color:var(--danger)">*</span></label>
-                <input type="email" id="regEmail" th:field="*{email}"
-                       placeholder="email@example.com" required autocomplete="email">
-            </div>
-            <div class="form-group">
-                <label for="regPassword">Mật khẩu <span style="color:var(--danger)">*</span></label>
-                <input type="password" id="regPassword" th:field="*{password}"
-                       placeholder="Min 8 ký tự, có chữ hoa + số" required minlength="8"
-                       autocomplete="new-password">
-                <small style="color:var(--text-secondary); font-size:12px;">
-                    Tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường và số.
-                </small>
-            </div>
-            <!-- UC-02: Confirm Password field -->
-            <div class="form-group">
-                <label for="regConfirmPassword">Xác nhận mật khẩu <span style="color:var(--danger)">*</span></label>
-                <input type="password" id="regConfirmPassword" name="confirmPassword"
-                       placeholder="Nhập lại mật khẩu" required minlength="8"
-                       autocomplete="new-password">
-            </div>
-
-            <!-- General register error (E1, E2) -->
-            <div class="form-error" th:if="${registerError}" th:text="${registerError}"
-                 style="display:block;"></div>
-
-            <button type="submit" class="btn btn-primary auth-submit">Tạo tài khoản</button>
-        </form>
-
-        <p class="auth-footer-text">학습의 즐거움을 발견하세요 ✨</p>
+  <!-- Logo -->
+  <div class="auth-logo-row">
+    <div class="logo-pill">KR</div>
+    <div class="logo-text-col">
+      <span class="logo-name">K<span>-Learn</span></span>
+      <span class="logo-sub">학습 플랫폼</span>
     </div>
+  </div>
+
+  <!-- Tab switcher (segmented control) -->
+  <div class="tab-switcher">
+    <button class="tab-btn" id="authTabLogin"
+            th:classappend="${activeTab == 'login'} ? ' active'"
+            type="button"
+            onclick="switchAuthTab('login')">Đăng nhập</button>
+    <button class="tab-btn" id="authTabRegister"
+            th:classappend="${activeTab == 'register'} ? ' active'"
+            type="button"
+            onclick="switchAuthTab('register')">Đăng ký</button>
+  </div>
+
+  <!-- ── Social login (shared for both tabs) ─────────── -->
+  <div class="social-btns">
+    <!-- Google -->
+    <button type="button" class="btn-social btn-google"
+            onclick="/* TODO: Google OAuth */ alert('Google OAuth chưa được cấu hình.')">
+      <!-- Real Google G SVG -->
+      <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.183l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+        <path d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.96L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+      </svg>
+      Tiếp tục với Google
+    </button>
+
+    <!-- Facebook -->
+    <button type="button" class="btn-social btn-facebook"
+            onclick="/* TODO: Facebook OAuth */ alert('Facebook OAuth chưa được cấu hình.')">
+      <!-- Facebook f SVG -->
+      <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="white">
+        <path d="M24 12.073C24 5.406 18.627 0 12 0S0 5.406 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+      </svg>
+      Tiếp tục với Facebook
+    </button>
+  </div>
+
+  <!-- Divider -->
+  <div class="social-divider">hoặc</div>
+
+  <!-- ══════════════════════════════════════════════════════
+       UC-01: LOGIN FORM
+  ══════════════════════════════════════════════════════ -->
+  <form id="loginForm" class="auth-form"
+        th:action="@{/auth/login}" method="post"
+        th:classappend="${activeTab == 'login'} ? ' visible'"
+        onsubmit="handleLoginSubmit(event)">
+
+    <!-- Alerts -->
+    <!-- UC-01 E1 -->
+    <div class="form-error" th:if="${errorMessage}" th:text="${errorMessage}"
+         th:classappend="${errorMessage != null} ? ' visible'"></div>
+    <!-- UC-03 logout -->
+    <div class="alert-success" th:if="${logoutMessage}" th:text="${logoutMessage}"></div>
+    <!-- UC-02 A1 registered -->
+    <div class="alert-success" th:if="${param.registered}">
+      ✅ Đăng ký thành công! Hãy đăng nhập.
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+      <label class="form-label" for="loginEmail">Email <span class="req">*</span></label>
+      <div class="input-wrap">
+        <span class="input-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+          </svg>
+        </span>
+        <input type="email" id="loginEmail" name="email" class="form-input"
+               placeholder="email@example.com" required autocomplete="email">
+      </div>
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label class="form-label" for="loginPassword">Mật khẩu <span class="req">*</span></label>
+      <div class="input-wrap">
+        <span class="input-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </span>
+        <input type="password" id="loginPassword" name="password" class="form-input"
+               placeholder="Nhập mật khẩu" required autocomplete="current-password">
+      </div>
+    </div>
+
+    <!-- Remember + Forgot -->
+    <div class="auth-options">
+      <label class="toggle-label">
+        <input type="checkbox" name="remember-me" class="toggle-input" id="rememberMe">
+        <span class="toggle-track"></span>
+        Ghi nhớ đăng nhập
+      </label>
+      <a th:href="@{/auth/forgot-password}" class="forgot-link">Quên mật khẩu?</a>
+    </div>
+
+    <button type="submit" class="btn-submit" id="loginBtn">
+      <span class="btn-text">Đăng nhập</span>
+      <span class="spinner"></span>
+    </button>
+  </form>
+
+  <!-- ══════════════════════════════════════════════════════
+       UC-02: REGISTER FORM
+  ══════════════════════════════════════════════════════ -->
+  <form id="registerForm" class="auth-form"
+        th:action="@{/auth/register}" method="post"
+        th:object="${registerRequest}"
+        th:classappend="${activeTab == 'register'} ? ' visible'"
+        onsubmit="handleRegisterSubmit(event)">
+
+    <!-- Register error -->
+    <div class="form-error" th:if="${registerError}" th:text="${registerError}"
+         th:classappend="${registerError != null} ? ' visible'"></div>
+
+    <!-- Full name -->
+    <div class="form-group">
+      <label class="form-label" for="regName">Họ tên <span class="req">*</span></label>
+      <div class="input-wrap">
+        <span class="input-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+          </svg>
+        </span>
+        <input type="text" id="regName" th:field="*{name}" class="form-input"
+               placeholder="Nguyễn Văn A" required autocomplete="name">
+      </div>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+      <label class="form-label" for="regEmail">Email <span class="req">*</span></label>
+      <div class="input-wrap">
+        <span class="input-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+          </svg>
+        </span>
+        <input type="email" id="regEmail" th:field="*{email}" class="form-input"
+               placeholder="email@example.com" required autocomplete="email">
+      </div>
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label class="form-label" for="regPassword">Mật khẩu <span class="req">*</span></label>
+      <div class="input-wrap">
+        <span class="input-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </span>
+        <input type="password" id="regPassword" th:field="*{password}" class="form-input"
+               placeholder="Tối thiểu 8 ký tự, chữ hoa + số" required minlength="8"
+               autocomplete="new-password">
+      </div>
+      <p class="input-hint">Tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường và số.</p>
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="form-group">
+      <label class="form-label" for="regConfirmPassword">Xác nhận mật khẩu <span class="req">*</span></label>
+      <div class="input-wrap">
+        <span class="input-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </span>
+        <input type="password" id="regConfirmPassword" name="confirmPassword" class="form-input"
+               placeholder="Nhập lại mật khẩu" required minlength="8"
+               autocomplete="new-password">
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="registerBtn">
+      <span class="btn-text">Tạo tài khoản</span>
+      <span class="spinner"></span>
+    </button>
+  </form>
+
+</div><!-- /.auth-card -->
+
+<!-- Footer (below card) -->
+<div class="auth-footer">
+  <p class="auth-footer-phrase">학습의 즐거움을 발견하세요 ✨</p>
+  <p class="auth-footer-cta">
+    Chưa có tài khoản?
+    <a href="#" onclick="switchAuthTab('register'); return false;">Đăng ký ngay</a>
+  </p>
 </div>
 
 <script th:src="@{/js/dark-mode.js}"></script>
 <script>
+/* ── Tab switcher ──────────────────────────────────── */
 function switchAuthTab(tab) {
-    document.getElementById('authTabLogin').classList.toggle('active', tab === 'login');
-    document.getElementById('authTabRegister').classList.toggle('active', tab === 'register');
-    document.getElementById('loginForm').style.display = tab === 'login' ? 'flex' : 'none';
-    document.getElementById('registerForm').style.display = tab === 'register' ? 'flex' : 'none';
+  ['login','register'].forEach(function(t) {
+    var btn  = document.getElementById('authTab' + (t === 'login' ? 'Login' : 'Register'));
+    var form = document.getElementById(t + 'Form');
+    var isActive = t === tab;
+    if (btn)  btn.classList.toggle('active', isActive);
+    if (form) form.classList.toggle('visible', isActive);
+  });
 }
+
+/* ── Submit loading state ──────────────────────────── */
+function handleLoginSubmit(e) {
+  var btn = document.getElementById('loginBtn');
+  if (btn) btn.classList.add('loading');
+  // Form submits normally to Spring Security
+}
+function handleRegisterSubmit(e) {
+  var btn = document.getElementById('registerBtn');
+  if (btn) btn.classList.add('loading');
+  // Form submits normally to AuthController
+}
+
+/* ── Init: ensure correct tab shown on Thymeleaf render ── */
+document.addEventListener('DOMContentLoaded', function() {
+  var loginActive    = document.getElementById('authTabLogin').classList.contains('active');
+  var registerActive = document.getElementById('authTabRegister').classList.contains('active');
+  if (!loginActive && !registerActive) switchAuthTab('login');
+});
 </script>
 </body>
 </html>
