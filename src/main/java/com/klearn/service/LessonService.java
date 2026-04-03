@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,8 +19,10 @@ public class LessonService {
     private final VocabularyRepository vocabularyRepository;
     private final ExerciseRepository exerciseRepository;
     private final UserProgressRepository userProgressRepository;
+    private final ReadingPassageRepository readingPassageRepository;
     private final StreakService streakService;
 
+    // ================= BASIC =================
     public Lesson getLessonById(Long id) {
         return lessonRepository.findById(id).orElse(null);
     }
@@ -35,25 +39,55 @@ public class LessonService {
         return exerciseRepository.findByLesson_LessonId(lessonId);
     }
 
+    // ================= CORE FILTER (QUAN TRỌNG) =================
+    public List<Exercise> getExercisesByLessonAndType(Long lessonId, Exercise.ExerciseType type) {
+        return exerciseRepository.findByLesson_LessonIdAndType(lessonId, type);
+    }
+
+    // ================= SKILL METHODS =================
+    public List<Exercise> getListeningExercisesByLesson(Long lessonId) {
+        return getExercisesByLessonAndType(lessonId, Exercise.ExerciseType.listening);
+    }
+
+    public List<Exercise> getSpeakingExercisesByLesson(Long lessonId) {
+        return getExercisesByLessonAndType(lessonId, Exercise.ExerciseType.speaking);
+    }
+
+    public List<ReadingPassage> getReadingPassagesByLesson(Long lessonId) {
+        return readingPassageRepository.findByLesson_LessonId(lessonId);
+    }
+
+    public List<Exercise> getWritingExercisesByLesson(Long lessonId) {
+        return getExercisesByLessonAndType(lessonId, Exercise.ExerciseType.writing);
+    }
+
+    // ================= PROGRESS =================
     @Transactional
     public void markLessonProgress(Long userId, Long lessonId, String status) {
-        Optional<UserProgress> progressOpt = userProgressRepository.findByUser_UserIdAndLesson_LessonId(userId, lessonId);
-        
+
+        Optional<UserProgress> progressOpt =
+                userProgressRepository.findByUser_UserIdAndLesson_LessonId(userId, lessonId);
+
         UserProgress progress;
+
         if (progressOpt.isPresent()) {
             progress = progressOpt.get();
         } else {
             progress = new UserProgress();
+
             User user = new User();
             user.setUserId(userId);
+
             Lesson lesson = lessonRepository.findById(lessonId).orElseThrow();
+
             progress.setUser(user);
             progress.setLesson(lesson);
         }
-        
+
         progress.setStatus(status);
         userProgressRepository.save(progress);
 
+        // Update streak nếu hoàn thành
         if ("completed".equals(status)) {
             streakService.updateStreak(userId);
         }

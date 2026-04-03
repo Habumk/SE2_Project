@@ -21,9 +21,7 @@ public class DataInitializer implements CommandLineRunner {
     private final HangulCharacterRepository hangulRepo;
     private final VocabWordRepository vocabRepo;
     private final GrammarLessonRepository grammarRepo;
-    private final ListeningExerciseRepository listeningRepo;
     private final SpeakingExerciseRepository speakingRepo;
-    private final ReadingPassageRepository readingRepo;
     private final BadgeRepository badgeRepo;
 
     @Override
@@ -31,9 +29,7 @@ public class DataInitializer implements CommandLineRunner {
         if (hangulRepo.count() == 0) seedHangul();
         if (vocabRepo.count() == 0) seedVocab();
         if (grammarRepo.count() == 0) seedGrammar();
-        if (listeningRepo.count() == 0) seedListening();
         if (speakingRepo.count() == 0) seedSpeaking();
-        if (readingRepo.count() == 0) seedReading();
         if (badgeRepo.count() == 0) seedBadges();
         log.info("✅ Data seeding complete!");
     }
@@ -190,20 +186,6 @@ public class DataInitializer implements CommandLineRunner {
         ));
     }
 
-    private void seedListening() {
-        log.info("🎧 Seeding Listening data...");
-        listeningRepo.saveAll(List.of(
-            li("안녕하세요", "Xin chào", "[\"Xin chào\",\"Tạm biệt\",\"Cảm ơn\",\"Xin lỗi\"]"),
-            li("감사합니다", "Cảm ơn", "[\"Xin lỗi\",\"Cảm ơn\",\"Xin chào\",\"Tạm biệt\"]"),
-            li("밥을 먹어요", "Ăn cơm", "[\"Uống nước\",\"Ăn cơm\",\"Đi học\",\"Ngủ\"]"),
-            li("학교에 가요", "Đi đến trường", "[\"Về nhà\",\"Đi chơi\",\"Đi đến trường\",\"Đi làm\"]"),
-            li("물을 주세요", "Cho tôi nước", "[\"Cho tôi cơm\",\"Cho tôi nước\",\"Cho tôi tiền\",\"Cho tôi sách\"]"),
-            li("이름이 뭐예요?", "Tên bạn là gì?", "[\"Bạn bao nhiêu tuổi?\",\"Tên bạn là gì?\",\"Bạn ở đâu?\",\"Bạn khỏe không?\"]"),
-            li("커피를 마셔요", "Uống cà phê", "[\"Uống trà\",\"Uống bia\",\"Uống cà phê\",\"Uống sữa\"]"),
-            li("날씨가 좋아요", "Thời tiết đẹp", "[\"Thời tiết xấu\",\"Thời tiết đẹp\",\"Trời mưa\",\"Trời lạnh\"]")
-        ));
-    }
-
     private void seedSpeaking() {
         log.info("🗣️ Seeding Speaking data...");
         speakingRepo.saveAll(List.of(
@@ -215,24 +197,6 @@ public class DataInitializer implements CommandLineRunner {
             sp("한국어를 공부해요", "hangugeo-reul gongbuhaeyo", "Tôi học tiếng Hàn"),
             sp("이름이 뭐예요?", "ireumi mwoyeyo?", "Tên bạn là gì?"),
             sp("만나서 반갑습니다", "mannaseo bangapseumnida", "Rất vui được gặp bạn")
-        ));
-    }
-
-    private void seedReading() {
-        log.info("📖 Seeding Reading data...");
-        readingRepo.saveAll(List.of(
-            ReadingPassage.builder()
-                .level("Sơ cấp")
-                .text("저는 학생입니다. 저는 베트남 사람입니다. 한국어를 공부합니다. 한국 음식을 좋아합니다. 특히 김치와 비빔밥을 좋아합니다.")
-                .translation("Tôi là học sinh. Tôi là người Việt Nam. Tôi học tiếng Hàn. Tôi thích món ăn Hàn Quốc. Đặc biệt tôi thích kimchi và cơm trộn.")
-                .questions("[{\"q\":\"이 사람은 누구입니까? (Người này là ai?)\",\"options\":[\"선생님 (Giáo viên)\",\"학생 (Học sinh)\",\"의사 (Bác sĩ)\"],\"answer\":1},{\"q\":\"이 사람은 무엇을 좋아합니까? (Người này thích gì?)\",\"options\":[\"일본 음식\",\"중국 음식\",\"한국 음식\"],\"answer\":2}]")
-                .build(),
-            ReadingPassage.builder()
-                .level("Sơ cấp")
-                .text("오늘은 토요일입니다. 날씨가 좋습니다. 저는 친구와 같이 공원에 갑니다. 공원에서 산책을 합니다. 그리고 커피를 마십니다.")
-                .translation("Hôm nay là thứ 7. Thời tiết đẹp. Tôi cùng bạn đi công viên. Chúng tôi đi dạo ở công viên. Và uống cà phê.")
-                .questions("[{\"q\":\"오늘은 무슨 요일입니까? (Hôm nay là thứ mấy?)\",\"options\":[\"일요일 (Chủ nhật)\",\"토요일 (Thứ 7)\",\"금요일 (Thứ 6)\"],\"answer\":1},{\"q\":\"어디에 갑니까? (Đi đâu?)\",\"options\":[\"학교 (Trường)\",\"공원 (Công viên)\",\"집 (Nhà)\"],\"answer\":1}]")
-                .build()
         ));
     }
 
@@ -269,10 +233,6 @@ public class DataInitializer implements CommandLineRunner {
 
     private VocabWord v(String kr, String roman, String vi, String category, String example) {
         return VocabWord.builder().kr(kr).roman(roman).vi(vi).category(category).example(example).build();
-    }
-
-    private ListeningExercise li(String text, String answer, String options) {
-        return ListeningExercise.builder().text(text).answer(answer).options(options).build();
     }
 
     private SpeakingExercise sp(String kr, String roman, String vi) {

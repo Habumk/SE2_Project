@@ -160,3 +160,8 @@ CREATE TABLE IF NOT EXISTS room_participant (
     FOREIGN KEY (room_id) REFERENCES speaking_room(room_id),
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
+
+ALTER TABLE reading_passages ADD lesson_id BIGINT;
+ALTER TABLE reading_passages
+ADD CONSTRAINT fk_reading_lesson FOREIGN KEY (lesson_id)
+REFERENCES lesson(lesson_id);

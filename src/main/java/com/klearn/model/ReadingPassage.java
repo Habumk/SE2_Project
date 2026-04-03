@@ -28,4 +28,8 @@ public class ReadingPassage {
     /** JSON array of questions */
     @Column(nullable = false, columnDefinition = "TEXT")
     private String questions;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lesson_id")
+    private Lesson lesson;
 }

@@ -2,69 +2,116 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
-<head><title>Luyện Nghe — K-Learn</title></head>
-<body>
+<head>
+    <title>Luyện Nghe — K-Learn</title>
+    <style>
+        .answer-option.selected {
+            background-color: #007bff !important;
+            color: white !important;
+            border-color: #0056b3 !important;
+        }
+        .answer-option.correct {
+            background-color: #28a745 !important;
+            color: white !important;
+            border-color: #1e7e34 !important;
+        }
+        .answer-option.incorrect {
+            background-color: #dc3545 !important;
+            color: white !important;
+            border-color: #bd2130 !important;
+        }
+        .playing-label {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body th:attr="data-lesson-id=${lesson.lessonId}">
 <div layout:fragment="content">
     <section class="page active" id="page-listening">
 
-        <div class="page-header">
+        <div class="page-header d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="page-title">
                     Luyện Nghe
                     <span class="title-kr-badge">듣기</span>
                 </h2>
-                <p class="page-subtitle">Nghe và chọn đáp án đúng</p>
+                <p class="page-subtitle text-muted">Nghe đoạn hội thoại/từ vựng và chọn đáp án đúng</p>
             </div>
-            <span class="skill-badge">🎧 듣기 연습</span>
+            <span class="skill-badge badge bg-info text-dark p-2">🎧 Listening Practice</span>
         </div>
 
-        <div class="exercise-container">
+        <div class="exercise-container container shadow-sm p-4 bg-light rounded">
 
-            <div class="exercise-progress">
-                <div class="progress-label">
-                    <span id="listeningProgress">Câu 1/5</span>
-                    <span class="progress-pct" id="listeningProgressPct">20%</span>
+            <div class="exercise-progress mb-4">
+                <div class="progress-label d-flex justify-content-between mb-1">
+                    <span id="listeningProgress" class="fw-bold">Đang tải...</span>
+                    <span class="progress-pct fw-bold" id="listeningProgressPct">0%</span>
                 </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="listeningProgressBar" style="width:20%"></div>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                         id="listeningProgressBar" role="progressbar" style="width: 0%"></div>
                 </div>
             </div>
 
-            <div class="listening-card">
-                <button class="btn-listen-big" id="listeningPlayBtn" onclick="playListeningAudio()">
-        <span class="listen-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round" width="36" height="36">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-          </svg>
-        </span>
+            <div class="listening-card text-center p-5 mb-4 border rounded bg-white">
+
+                <audio id="listeningAudio" style="display:none"></audio>
+
+                <button class="btn btn-outline-primary btn-listen-big rounded-circle p-4 mb-3"
+                        onclick="playListeningAudio()"
+                        style="width: 100px; height: 100px;">
+                    <span class="listen-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                        </svg>
+                    </span>
                 </button>
-                <div class="playing-label">
-                    <div class="wave-bars">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                    Đang phát...
+
+                <div class="playing-label mb-2 text-primary fw-bold">
+                    <div class="spinner-grow spinner-grow-sm" role="status"></div>
+                    Đang phát âm thanh...
                 </div>
-                <p class="listening-hint" id="listeningHint">Nghe câu và chọn nghĩa đúng</p>
+
+                <p class="listening-hint text-muted italic" id="listeningHint">
+                    Bấm vào biểu tượng loa để nghe đoạn hội thoại
+                </p>
             </div>
 
-            <div class="answer-options" id="listeningAnswers"></div>
-
-            <div class="exercise-result" id="listeningResult" style="display:none;">
-
-                <div class="result-text" id="listeningResultText">Chính xác!</div>
-                <div class="result-explanation" id="listeningResultExplanation"></div>
+            <div id="listeningQuestions" class="mb-4">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p>Đang chuẩn bị câu hỏi...</p>
+                </div>
             </div>
 
-            <div class="exercise-actions">
-                <button class="btn btn-primary" id="listeningNextBtn"
-                        onclick="nextListeningQuestion()" style="display:none;">Câu tiếp theo →</button>
+            <div class="exercise-result alert alert-info" id="listeningResult" style="display:none;">
+                <div class="result-text fw-bold" id="listeningResultText"></div>
+                <div class="result-explanation mt-2" id="listeningResultExplanation"></div>
+            </div>
+
+            <div class="exercise-actions d-flex gap-3 justify-content-center mt-5">
+                <button class="btn btn-primary btn-lg px-5" id="btnCheckListening" onclick="checkListeningAnswers()">
+                    Kiểm tra đáp án
+                </button>
+
+                <button class="btn btn-success btn-lg px-5"
+                        id="listeningNextBtn"
+                        onclick="nextListening()"
+                        style="display:none;">
+                    Bài tiếp theo <i class="fas fa-arrow-right ms-2"></i>
+                </button>
             </div>
 
         </div>
     </section>
 </div>
+
+<th:block layout:fragment="script">
+</th:block>
+
 </body>
 </html>

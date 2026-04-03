@@ -14,6 +14,9 @@ let state = {
     // Listening
     listeningIndex: 0,
     listeningQuestions: [],
+    listeningData: [],
+    listeningIndex: 0,
+    listeningAnswers: {},
     // Speaking
     speakingIndex: 0,
     isRecording: false,
@@ -42,38 +45,25 @@ let state = {
 // ---- Init ----
 // In Spring Boot MVC, pages are rendered by Thymeleaf. No need to load partials.
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Lấy lessonId từ thuộc tính data của body (đã định nghĩa ở file HTML)
+    const lessonId = document.body.getAttribute("data-lesson-id");
+
+    // 2. Kiểm tra nếu đang ở trang Listening thì mới chạy loadListening
+    if (document.getElementById("page-listening")) {
+        if (lessonId) {
+            loadListening(lessonId);
+        } else {
+            console.error("Không tìm thấy lessonId để tải bài nghe!");
+        }
+    }
+
+    // Gọi các hàm khởi tạo chung khác của bạn
     initApp();
 });
 
-async function fetchInitialData() {
-    try {
-        const [hangul, vocab, categories, grammar, listening, speaking, reading] = await Promise.all([
-            fetch('/api/hangul').then(r => r.json()),
-            fetch('/api/vocab').then(r => r.json()),
-            fetch('/api/vocab/categories').then(r => r.json()),
-            fetch('/api/grammar').then(r => r.json()),
-            fetch('/api/listening').then(r => r.json()),
-            fetch('/api/speaking').then(r => r.json()),
-            fetch('/api/reading').then(r => r.json())
-        ]);
-        
-        HANGUL_DATA = hangul;
-        VOCAB_DATA = vocab;
-        CATEGORY_LABELS = categories;
-        GRAMMAR_DATA = grammar;
-        LISTENING_DATA = listening.map(l => ({...l, options: JSON.parse(l.options)}));
-        SPEAKING_DATA = speaking;
-        READING_DATA = reading.map(r => ({...r, questions: JSON.parse(r.questions)}));
-        
-        return true;
-    } catch (e) {
-        console.error("Lỗi khi tải dữ liệu từ API:", e);
-        return false;
-    }
-}
-
 async function initApp() {
-    // Read user info from DOM (injected by Thymeleaf)
+
+    // User info
     const nameEl = document.getElementById('profileDropdownName');
     const emailEl = document.getElementById('profileDropdownEmail');
     state._currentUser = {
@@ -82,22 +72,7 @@ async function initApp() {
         role: 'user'
     };
 
-    // Show loading indicator
-    const loadingToast = document.createElement('div');
-    loadingToast.innerHTML = 'Đang tải dữ liệu học tập...';
-    loadingToast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#3b82f6; color:white; padding:10px 20px; border-radius:8px; z-index:9999;';
-    document.body.appendChild(loadingToast);
-
-    // Fetch data from API
-    const dataLoaded = await fetchInitialData();
-    loadingToast.remove();
-
-    if (!dataLoaded) {
-        showToast("Lỗi tải dữ liệu. Vui lòng tải lại trang.", "error");
-        return;
-    }
-
-    // Init client-side features
+    // Init client features
     loadState();
     updateStreak();
     initSidebar();
@@ -105,7 +80,7 @@ async function initApp() {
     renderDashboard();
     initStudyRoom();
 
-    // Init page-specific features based on current page
+    // Init page-specific
     const pageId = document.querySelector('.page.active');
     if (pageId) {
         const page = pageId.id.replace('page-', '');
@@ -123,7 +98,10 @@ async function initApp() {
         }
     }
 
-    setInterval(() => { state.studyMinutes++; saveState(); }, 60000);
+    setInterval(() => {
+        state.studyMinutes++;
+        saveState();
+    }, 60000);
 }
 
 // Auth tabs are in the separate login.html page (Thymeleaf)
@@ -311,30 +289,59 @@ function speakKorean(text) {
 }
 
 // ---- Dashboard ----
-function renderDashboard() {
-    document.getElementById('streakCount').textContent = state.streak;
-    document.getElementById('headerStreak').textContent = '🔥 ' + state.streak;
-    document.getElementById('statWordsLearned').textContent = state.vocabLearned.length;
-    document.getElementById('statLessonsCompleted').textContent = state.lessonsCompleted;
-    const avgScore = state.quizScores.length ? Math.round(state.quizScores.reduce((a, b) => a + b, 0) / state.quizScores.length) : 0;
-    document.getElementById('statQuizScore').textContent = avgScore + '%';
-    const hours = Math.floor(state.studyMinutes / 60);
-    document.getElementById('statStudyTime').textContent = hours > 0 ? hours + 'h' : state.studyMinutes + 'm';
+async function renderDashboard() {
+    try {
+        // ---- Elements ----
+        const elStreakCount = document.getElementById('streakCount');
+        const elHeaderStreak = document.getElementById('headerStreak');
+        const elWordsLearned = document.getElementById('statWordsLearned');
+        const elLessonsCompleted = document.getElementById('statLessonsCompleted');
+        const elQuizScore = document.getElementById('statQuizScore');
+        const elStudyTime = document.getElementById('statStudyTime');
+        const elDwKorean = document.getElementById('dwKorean');
+        const elDwRoman = document.getElementById('dwRomanization');
+        const elDwMeaning = document.getElementById('dwMeaning');
 
-    // Daily word
-    const dayIndex = new Date().getDate() % DAILY_WORDS.length;
-    const dw = DAILY_WORDS[dayIndex];
-    document.getElementById('dwKorean').textContent = dw.kr;
-    document.getElementById('dwRomanization').textContent = dw.roman;
-    document.getElementById('dwMeaning').textContent = dw.vi;
+        // ---- Stats ----
+        if (elStreakCount) elStreakCount.textContent = state.streak;
+        if (elHeaderStreak) elHeaderStreak.textContent = '🔥 ' + state.streak;
+        if (elWordsLearned) elWordsLearned.textContent = state.vocabLearned.length;
+        if (elLessonsCompleted) elLessonsCompleted.textContent = state.lessonsCompleted;
 
-    // Progress
-    const totalHangul = HANGUL_DATA.consonants.length + HANGUL_DATA.vowels.length + HANGUL_DATA.double.length + HANGUL_DATA.compound.length;
-    setProgress('Hangul', state.hangulLearned.length, totalHangul);
-    setProgress('Vocab', state.vocabLearned.length, VOCAB_DATA.length);
-    setProgress('Grammar', Math.min(state.lessonsCompleted, GRAMMAR_DATA.length), GRAMMAR_DATA.length);
-    setProgress('Listening', 0, 100);
-    setProgress('Reading', 0, 100);
+        const avgScore = state.quizScores.length
+            ? Math.round(state.quizScores.reduce((a, b) => a + b, 0) / state.quizScores.length)
+            : 0;
+        if (elQuizScore) elQuizScore.textContent = avgScore + '%';
+
+        const hours = Math.floor(state.studyMinutes / 60);
+        if (elStudyTime) elStudyTime.textContent = hours > 0 ? hours + 'h' : state.studyMinutes + 'm';
+
+        // ---- Daily word (random) ----
+        if (elDwKorean && elDwRoman && elDwMeaning && DAILY_WORDS.length) {
+            const randomIndex = Math.floor(Math.random() * DAILY_WORDS.length);
+            const dw = DAILY_WORDS[randomIndex];
+            elDwKorean.textContent = dw.kr;
+            elDwRoman.textContent = dw.roman;
+            elDwMeaning.textContent = dw.vi;
+        }
+
+        // ---- Hangul progress from DB ----
+        // gọi API lấy tất cả từ vựng Hangul đã học
+        const res = await fetch('/api/vocabulary/hangul'); // backend trả về JSON array [{hangul,...}]
+        const hangulData = await res.json();
+        const totalHangul = hangulData.length;
+        const learnedHangul = state.hangulLearned.length;
+
+        if (typeof setProgress === 'function') {
+            setProgress('Hangul', learnedHangul, totalHangul);
+            setProgress('Vocab', state.vocabLearned.length, VOCAB_DATA?.length || 0);
+            setProgress('Grammar', Math.min(state.lessonsCompleted, GRAMMAR_DATA?.length || 0), GRAMMAR_DATA?.length || 0);
+            setProgress('Listening', 0, 100);
+            setProgress('Reading', 0, 100);
+        }
+    } catch (err) {
+        console.error('Lỗi renderDashboard:', err);
+    }
 }
 
 function setProgress(name, current, total) {
@@ -449,59 +456,127 @@ function showGrammarModal(index) {
 
 function closeGrammarModal() { document.getElementById('grammarModal').style.display = 'none'; }
 
-// ---- Listening ----
-function initListening() {
-    state.listeningQuestions = shuffle([...LISTENING_DATA]).slice(0, 5);
-    state.listeningIndex = 0;
-    renderListeningQuestion();
-}
+//Listening
+// ================= LOAD DATA =================
+async function loadListening(lessonId) {
+    try {
+        const res = await fetch(`/api/lessons/${lessonId}/listening`);
+        if (!res.ok) throw new Error("Lỗi tải dữ liệu");
 
-function renderListeningQuestion() {
-    const q = state.listeningQuestions[state.listeningIndex];
-    if (!q) return;
-    document.getElementById('listeningProgress').textContent = `Câu ${state.listeningIndex + 1}/${state.listeningQuestions.length}`;
-    document.getElementById('listeningProgressBar').style.width = ((state.listeningIndex + 1) / state.listeningQuestions.length * 100) + '%';
-    document.getElementById('listeningResult').style.display = 'none';
-    document.getElementById('listeningNextBtn').style.display = 'none';
-    document.getElementById('listeningHint').textContent = 'Nghe câu và chọn nghĩa đúng';
-    const shuffled = shuffle([...q.options]);
-    document.getElementById('listeningAnswers').innerHTML = shuffled.map((opt, i) =>
-        `<button class="answer-option" onclick="checkListeningAnswer(this, '${opt.replace(/'/g, "\\'")}')">
-            <span class="answer-letter">${String.fromCharCode(65 + i)}</span><span>${opt}</span>
-        </button>`
-    ).join('');
-}
+        const data = await res.json();
+        state.listeningData = data || [];
+        state.listeningIndex = 0;
+        state.listeningAnswers = {};
 
-function playListeningAudio() {
-    const q = state.listeningQuestions[state.listeningIndex];
-    if (q) speakKorean(q.text);
-}
-
-function checkListeningAnswer(el, answer) {
-    const q = state.listeningQuestions[state.listeningIndex];
-    const correct = answer === q.answer;
-    document.querySelectorAll('.answer-option').forEach(o => {
-        o.classList.add('disabled');
-        if (o.querySelector('span:last-child').textContent === q.answer) o.classList.add('correct');
-    });
-    if (!correct) el.classList.add('incorrect');
-    document.getElementById('listeningResult').style.display = 'block';
-    document.getElementById('listeningResultIcon').textContent = correct ? '✅' : '❌';
-    document.getElementById('listeningResultText').textContent = correct ? 'Chính xác!' : 'Sai rồi!';
-    document.getElementById('listeningResultExplanation').textContent = `"${q.text}" = ${q.answer}`;
-    document.getElementById('listeningNextBtn').style.display = 'inline-flex';
-}
-
-function nextListeningQuestion() {
-    state.listeningIndex++;
-    if (state.listeningIndex >= state.listeningQuestions.length) {
-        showToast('Hoàn thành bài nghe! 🎉', 'success');
-        initListening();
-    } else {
-        renderListeningQuestion();
+        const container = document.getElementById('listeningQuestions');
+        if (state.listeningData.length === 0) {
+            if (container) container.innerHTML = "<p class='text-center text-muted'>Chưa có dữ liệu bài nghe</p>";
+            return;
+        }
+        renderListening();
+    } catch (err) {
+        console.error("Lỗi load listening:", err);
     }
 }
 
+// ================= RENDER UI =================
+function renderListening() {
+    const l = state.listeningData[state.listeningIndex];
+    if (!l) return;
+
+    // Cập nhật Progress
+    const progressPct = ((state.listeningIndex + 1) / state.listeningData.length) * 100;
+    const progressFill = document.getElementById('listeningProgressBar');
+    if (progressFill) progressFill.style.width = `${progressPct}%`;
+
+    const progressText = document.getElementById('listeningProgress');
+    if (progressText) progressText.innerText = `Bài ${state.listeningIndex + 1}/${state.listeningData.length}`;
+
+    // Reset Audio
+    const audioEl = document.getElementById('listeningAudio');
+    if (audioEl) {
+        audioEl.src = l.audioUrl || "";
+        audioEl.load();
+    }
+
+    // Render Questions
+    const questionsContainer = document.getElementById('listeningQuestions');
+    if (questionsContainer) {
+        questionsContainer.innerHTML = l.questions.map((q, qi) => `
+            <div class="question-card mb-4 p-3 border rounded bg-white">
+                <p class="fw-bold">${qi + 1}. ${q.q}</p>
+                <div class="d-grid gap-2">
+                    ${q.options.map((opt, oi) => `
+                        <button class="answer-option btn btn-outline-secondary text-start"
+                            data-qi="${qi}" data-oi="${oi}"
+                            onclick="selectListening(${qi}, ${oi})">
+                            ${opt}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Toggle Buttons
+    document.getElementById('listeningNextBtn').style.display = 'none';
+}
+
+// ================= LOGIC NGHIỆP VỤ =================
+function playListeningAudio() {
+    const audio = document.getElementById('listeningAudio');
+    if (audio && audio.src) {
+        audio.play().catch(err => console.warn("Playback blocked", err));
+    }
+}
+
+function selectListening(qi, oi) {
+    state.listeningAnswers[qi] = oi;
+    // UI feedback
+    document.querySelectorAll(`.answer-option[data-qi="${qi}"]`).forEach(btn => {
+        btn.classList.remove('btn-primary', 'text-white');
+        btn.classList.add('btn-outline-secondary');
+    });
+    const selectedBtn = document.querySelector(`.answer-option[data-qi="${qi}"][data-oi="${oi}"]`);
+    selectedBtn.classList.replace('btn-outline-secondary', 'btn-primary');
+    selectedBtn.classList.add('text-white');
+}
+
+function checkListeningAnswers() {
+    const l = state.listeningData[state.listeningIndex];
+    let correctCount = 0;
+
+    l.questions.forEach((q, qi) => {
+        const userAnswer = state.listeningAnswers[qi];
+        const correctAnswer = q.answer;
+
+        document.querySelectorAll(`.answer-option[data-qi="${qi}"]`).forEach(btn => {
+            const oi = parseInt(btn.dataset.oi);
+            btn.classList.remove('btn-primary', 'btn-outline-secondary');
+
+            if (oi === correctAnswer) btn.classList.add('btn-success', 'text-white');
+            if (userAnswer === oi && oi !== correctAnswer) btn.classList.add('btn-danger', 'text-white');
+
+            btn.style.pointerEvents = 'none';
+        });
+
+        if (userAnswer === correctAnswer) correctCount++;
+    });
+
+    // Hiện nút Tiếp theo
+    document.getElementById('listeningNextBtn').style.display = 'inline-flex';
+}
+
+function nextListening() {
+    state.listeningIndex++;
+    if (state.listeningIndex < state.listeningData.length) {
+        state.listeningAnswers = {};
+        renderListening();
+    } else {
+        alert("Hoàn thành bài tập nghe! 🎉");
+        // Logic chuyển trang hoặc hoàn tất
+    }
+}
 // ---- Speaking ----
 function initSpeaking() {
     state.speakingIndex = Math.floor(Math.random() * SPEAKING_DATA.length);
@@ -581,70 +656,178 @@ function calculateSimilarity(a, b) {
     return matches / longer.length;
 }
 
-// ---- Reading ----
-function initReading() {
-    state.readingIndex = state.readingIndex % READING_DATA.length;
-    state.readingAnswers = {};
-    renderReadingPassage();
+// ================= GLOBAL STATE (FIX TRÙNG) =================
+window.state = window.state || {
+    readingData: [],
+    readingIndex: 0,
+    readingAnswers: {}
+};
+
+// ================= LOAD FROM API =================
+async function loadReading(lessonId) {
+    try {
+        const res = await fetch(`/api/lessons/${lessonId}/reading`);
+
+        if (!res.ok) throw new Error("API error");
+
+        const data = await res.json();
+
+        state.readingData = data || [];
+        state.readingIndex = 0;
+        state.readingAnswers = {};
+
+        console.log("Reading data:", state.readingData);
+
+        renderReadingPassage();
+    } catch (e) {
+        console.error(e);
+        document.getElementById('readingQuestions').innerHTML =
+            "<p>Không tải được bài đọc.</p>";
+    }
 }
 
+// ================= INIT =================
+function initReading() {
+    const lessonId = document.body.getAttribute("data-lesson-id");
+
+    if (!lessonId) {
+        console.error("Không tìm thấy lessonId");
+        return;
+    }
+
+    loadReading(lessonId);
+}
+
+// ================= RENDER =================
 function renderReadingPassage() {
-    const r = READING_DATA[state.readingIndex];
-    document.getElementById('readingLevel').textContent = 'Cấp độ: ' + r.level;
-    document.getElementById('readingTextKr').textContent = r.text;
-    document.getElementById('readingTextVi').textContent = r.translation;
+    const r = state.readingData[state.readingIndex];
+
+    if (!r) {
+        document.getElementById('readingQuestions').innerHTML =
+            "<p>Không có bài đọc.</p>";
+        return;
+    }
+
+    const questions = r.questions || [];
+
+    document.getElementById('readingLevel').textContent =
+        'Cấp độ: ' + (r.level || '');
+
+    document.getElementById('readingTextKr').textContent =
+        r.text || '';
+
+    document.getElementById('readingTextVi').textContent =
+        r.translation || '';
+
     document.getElementById('readingTextVi').style.display = 'none';
-    document.getElementById('readingToggleTranslation').textContent = '👁️ Hiện bản dịch';
+    document.getElementById('readingToggleTranslation').textContent =
+        '👁️ Hiện bản dịch';
+
     document.getElementById('readingCheckBtn').style.display = 'inline-flex';
     document.getElementById('readingNextBtn').style.display = 'none';
 
-    document.getElementById('readingQuestions').innerHTML = r.questions.map((q, qi) => `
+    document.getElementById('readingQuestions').innerHTML = questions.map((q, qi) => `
         <div class="reading-question">
             <p>${qi + 1}. ${q.q}</p>
             <div class="reading-options">
-                ${q.options.map((opt, oi) => `
-                    <button class="reading-option" data-qi="${qi}" data-oi="${oi}" onclick="selectReadingOption(${qi}, ${oi})">${opt}</button>
+                ${(q.options || []).map((opt, oi) => `
+                    <button class="reading-option"
+                        data-qi="${qi}"
+                        data-oi="${oi}"
+                        onclick="selectReadingOption(${qi}, ${oi})">
+                        ${opt}
+                    </button>
                 `).join('')}
             </div>
         </div>
     `).join('');
 }
 
+// ================= TRANSLATION =================
 function toggleReadingTranslation() {
     const el = document.getElementById('readingTextVi');
     const btn = document.getElementById('readingToggleTranslation');
-    if (el.style.display === 'none') { el.style.display = 'block'; btn.textContent = '🙈 Ẩn bản dịch'; }
-    else { el.style.display = 'none'; btn.textContent = '👁️ Hiện bản dịch'; }
+
+    if (el.style.display === 'none') {
+        el.style.display = 'block';
+        btn.textContent = '🙈 Ẩn bản dịch';
+    } else {
+        el.style.display = 'none';
+        btn.textContent = '👁️ Hiện bản dịch';
+    }
 }
 
+// ================= SELECT =================
 function selectReadingOption(qi, oi) {
     state.readingAnswers[qi] = oi;
-    document.querySelectorAll(`[data-qi="${qi}"]`).forEach(o => o.classList.remove('selected'));
-    document.querySelector(`[data-qi="${qi}"][data-oi="${oi}"]`).classList.add('selected');
+
+    document.querySelectorAll(`[data-qi="${qi}"]`)
+        .forEach(o => o.classList.remove('selected'));
+
+    const selected = document.querySelector(
+        `[data-qi="${qi}"][data-oi="${oi}"]`
+    );
+
+    if (selected) selected.classList.add('selected');
 }
 
+// ================= CHECK =================
 function checkReadingAnswers() {
-    const r = READING_DATA[state.readingIndex];
+    const r = state.readingData[state.readingIndex];
+    if (!r) return;
+
+    if (Object.keys(state.readingAnswers).length === 0) {
+        showToast("Hãy chọn đáp án trước", "info");
+        return;
+    }
+
     let correct = 0;
-    r.questions.forEach((q, qi) => {
+
+    (r.questions || []).forEach((q, qi) => {
         document.querySelectorAll(`[data-qi="${qi}"]`).forEach(o => {
             const oi = parseInt(o.dataset.oi);
+
             if (oi === q.answer) o.classList.add('correct');
-            if (state.readingAnswers[qi] === oi && oi !== q.answer) o.classList.add('incorrect');
+
+            if (state.readingAnswers[qi] === oi && oi !== q.answer)
+                o.classList.add('incorrect');
+
             o.style.pointerEvents = 'none';
         });
+
         if (state.readingAnswers[qi] === q.answer) correct++;
     });
-    showToast(`Kết quả: ${correct}/${r.questions.length} câu đúng`, correct === r.questions.length ? 'success' : 'info');
+
+    showToast(
+        `Kết quả: ${correct}/${r.questions.length} câu đúng`,
+        correct === r.questions.length ? 'success' : 'info'
+    );
+
     document.getElementById('readingCheckBtn').style.display = 'none';
     document.getElementById('readingNextBtn').style.display = 'inline-flex';
 }
 
+// ================= NEXT =================
 function nextReadingPassage() {
-    state.readingIndex = (state.readingIndex + 1) % READING_DATA.length;
-    state.readingAnswers = {};
-    renderReadingPassage();
+    state.readingIndex++;
+
+    if (state.readingIndex >= state.readingData.length) {
+        showToast('Hoàn thành bài đọc! 🎉', 'success');
+        initReading();
+    } else {
+        state.readingAnswers = {};
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        renderReadingPassage();
+    }
 }
+
+// ================= AUTO INIT =================
+document.addEventListener("DOMContentLoaded", function () {
+    if (document.getElementById("page-reading")) {
+        initReading();
+    }
+});
+
 
 // ---- Writing ----
 function initWriting() {

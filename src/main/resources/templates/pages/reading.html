@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 <head><title>Luyện Đọc — K-Learn</title></head>
-<body>
+<body th:attr="data-lesson-id=${lesson.lessonId}">
 <div layout:fragment="content">
 <section class="page active" id="page-reading">
     <div class="page-header">
