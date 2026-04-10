@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses - K-Learn</title>
+    <style>
+        :root {
+            --primary-purple: #6c5ce7;
+            --soft-bg: #fdfdff;
+            --text-dark: #2d3436;
+            --card-radius: 24px;
+        }
+
+        #page-courses {
+            max-width: 1100px;
+            margin: auto;
+            padding: 50px 20px;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 850;
+            color: var(--text-dark);
+            margin: 0;
+            letter-spacing: -1.5px;
+        }
+
+        .page-subtitle {
+            color: #636e72;
+            margin-top: 8px;
+            font-size: 1.1rem;
+        }
+
+        /* ===== GRID TỐI ƯU ===== */
+        .exercise-container ul {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            list-style: none;
+            padding: 0;
+        }
+
+        /* ===== CARD KHÓA HỌC ===== */
+        .quick-action-card {
+            height: 220px;
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding: 25px;
+            text-decoration: none;
+
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+
+            /* Hiệu ứng bóng đổ mềm */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Hiệu ứng khi di chuột */
+        .quick-action-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(108, 92, 231, 0.2);
+        }
+
+        /* Overlay chuyển màu mượt mà hơn */
+        .quick-action-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.8) 100%);
+            z-index: 1;
+            transition: opacity 0.3s;
+        }
+
+        .quick-action-card:hover::before {
+            background: linear-gradient(180deg, rgba(0,0,0,0) 20%, rgba(108, 92, 231, 0.8) 100%);
+        }
+
+        /* Nội dung bên trong Card */
+        .card-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .card-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.2;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* ===== TRẠNG THÁI TRỐNG ===== */
+        .empty-courses {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px;
+            background: #f1f2f6;
+            border-radius: var(--card-radius);
+            color: #a4b0be;
+            border: 2px dashed #dfe4ea;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            #page-courses { padding: 30px 15px; }
+            .page-title { font-size: 2rem; }
+            .quick-action-card { height: 180px; }
+            .exercise-container ul { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <section class="page active" id="page-courses">
+        <div class="page-header">
+            <div>
+                <h2 class="page-title">📚 Giáo trình <span style="color: var(--primary-purple);">K-Learn</span></h2>
+                <p class="page-subtitle">Khám phá lộ trình học tiếng Hàn bài bản từ cơ bản đến nâng cao</p>
+            </div>
+        </div>
+
+        <div class="exercise-container">
+            <ul>
+                <li th:each="course : ${courses}">
+                    <a th:href="@{/courses/{id}/lessons(id=${course.courseId})}"
+                       class="quick-action-card"
+                       th:attr="data-img=${course.imageUrl}">
+
+                        <div class="card-content">
+                            <span class="card-tag">Học tập</span>
+                            <div class="card-title" th:text="${course.title}">Tiếng Hàn Sơ Cấp 1</div>
+                        </div>
+                    </a>
+                </li>
+
+                <li th:if="${#lists.isEmpty(courses)}" class="empty-courses">
+                    <p>Hiện tại chưa có giáo trình nào. Bạn quay lại sau nhé! 🌸</p>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const defaultImages = [
+                'linear-gradient(135deg, #6c5ce7, #a29bfe)',
+                'linear-gradient(135deg, #00b894, #55efc4)',
+                'linear-gradient(135deg, #fab1a0, #ff7675)',
+                'linear-gradient(135deg, #0984e3, #74b9ff)'
+            ];
+
+            document.querySelectorAll('.quick-action-card').forEach((card, index) => {
+                const img = card.getAttribute('data-img');
+
+                if (img && img !== 'null' && img.trim() !== '') {
+                    card.style.backgroundImage = `url('${img}')`;
+                } else {
+                    // Nếu không có ảnh, dùng màu Gradient ngẫu nhiên cho trẻ trung
+                    card.style.background = defaultImages[index % defaultImages.length];
+                }
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

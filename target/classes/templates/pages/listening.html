@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Luyện Nghe — K-Learn</title>
+    <style>
+        /* ═══════════════════════════════════════════════════
+           K-LEARN LISTENING REFRESH
+        ═══════════════════════════════════════════════════ */
+        :root {
+            --blue: #3b82f6;
+            --blue-light: #eff6ff;
+            --green: #10b981;
+            --red: #ef4444;
+            --bg-gray: #f8fafc;
+        }
+
+        #page-listening {
+            max-width: 850px;
+            margin: auto;
+            padding: 40px 20px;
+            font-family: 'Pretendard', system-ui, sans-serif;
+        }
+
+        /* ── HEADER & BADGES ── */
+        .title-kr-badge {
+            font-size: 0.5em;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--blue);
+            padding: 4px 12px;
+            border-radius: 12px;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+
+        .skill-badge {
+            border-radius: 50px !important;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* ── PROGRESS BAR ── */
+        .exercise-progress { margin-bottom: 35px; }
+        .progress {
+            background-color: #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, var(--blue), #60a5fa);
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        }
+
+        /* ── MAIN LISTENING CARD ── */
+        .listening-card {
+            background: white !important;
+            border: 2px solid #f1f5f9 !important;
+            border-radius: 30px !important;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Hiệu ứng loa to, tròn, nảy */
+        .btn-listen-big {
+            background: var(--blue-light);
+            border: none !important;
+            color: var(--blue) !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn-listen-big:hover {
+            transform: scale(1.1);
+            background: var(--blue) !important;
+            color: white !important;
+        }
+
+        /* Sóng âm khi đang phát nhạc */
+        .is-playing {
+            animation: pulse-wave 1.5s infinite;
+        }
+
+        @keyframes pulse-wave {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { box-shadow: 0 0 0 25px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        .playing-label {
+            opacity: 0;
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--blue);
+            letter-spacing: 0.5px;
+        }
+        .is-playing + .playing-label { opacity: 1; }
+
+        /* ── QUESTION AREA ── */
+        .question-item {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .answer-option {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: #fff;
+            border: 2px solid #f1f5f9;
+            border-radius: 15px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .answer-option:hover:not(.correct):not(.incorrect) {
+            border-color: var(--blue);
+            background: var(--blue-light);
+            padding-left: 25px;
+        }
+
+        /* Trạng thái đáp án */
+        .answer-option.selected {
+            background-color: var(--blue) !important;
+            color: white !important;
+            border-color: var(--blue) !important;
+            transform: translateX(10px);
+        }
+
+        .answer-option.correct {
+            background-color: var(--green) !important;
+            color: white !important;
+            border-color: var(--green) !important;
+        }
+
+        .answer-option.incorrect {
+            background-color: var(--red) !important;
+            color: white !important;
+            border-color: var(--red) !important;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* ── RESULT ALERT ── */
+        #listeningResult {
+            border-radius: 20px;
+            border: none;
+            padding: 25px;
+            background: #f0f9ff;
+            color: #0369a1;
+            margin-top: 30px;
+        }
+
+        /* ── BUTTONS ── */
+        .btn-lg {
+            border-radius: 16px !important;
+            padding: 16px 40px !important;
+            font-weight: 800 !important;
+            font-size: 17px !important;
+            transition: all 0.3s;
+        }
+
+        .btn-primary { background: var(--blue); border: none; }
+        .btn-success { background: var(--green); border: none; }
+    </style>
+</head>
+<body th:attr="data-lesson-id=${lessonId}">
+<div layout:fragment="content">
+    <section class="page active" id="page-listening">
+
+        <div class="page-header d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="page-title" style="font-size: 2rem; font-weight: 900; margin-bottom: 5px;">
+                    Luyện Nghe <span class="title-kr-badge">듣기</span>
+                </h2>
+                <p class="page-subtitle text-muted" style="font-size: 1.1rem;">Nghe máy đọc và chọn đáp án chính xác nhất</p>
+            </div>
+            <span class="skill-badge badge bg-info text-dark p-3">🎧 AI VOICE</span>
+        </div>
+
+        <div class="exercise-container">
+            <div class="exercise-progress">
+                <div class="progress-label d-flex justify-content-between mb-2">
+                    <span id="listeningProgress" class="fw-bold text-muted">Bắt đầu bài tập...</span>
+                    <span class="progress-pct fw-bold text-primary" id="listeningProgressPct">0%</span>
+                </div>
+                <div class="progress" style="height: 12px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                         id="listeningProgressBar" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="listening-card text-center p-5 mb-5 shadow-sm">
+                <button id="btnPlayTTS" class="btn btn-listen-big rounded-circle mb-3"
+                        onclick="playListeningAudio()"
+                        style="width: 120px; height: 120px; display: inline-flex; align-items: center; justify-content: center;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                         stroke-linecap="round" stroke-linejoin="round" width="50" height="50">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                    </svg>
+                </button>
+
+                <div class="playing-label fw-bold">
+                    <div class="spinner-grow spinner-grow-sm me-2" role="status"></div>
+                    AI đang đọc, hãy lắng nghe kỹ...
+                </div>
+
+                <p class="listening-hint text-muted mt-3" id="listeningHint" style="font-style: italic; font-size: 15px;">
+                    Chạm vào loa để nghe phát âm tiếng Hàn
+                </p>
+            </div>
+
+            <div id="listeningQuestions" class="mb-4">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+                    <p class="mt-3 text-muted fw-bold">Đang chuẩn bị câu hỏi cho bạn...</p>
+                </div>
+            </div>
+
+            <div class="exercise-result shadow-sm" id="listeningResult" style="display:none;">
+                <div class="d-flex align-items-center">
+                    <div style="font-size: 2.5rem; margin-right: 20px;">💡</div>
+                    <div>
+                        <div class="result-text" id="listeningResultText" style="font-size: 18px;"></div>
+                        <div class="result-explanation mt-1 opacity-75" id="listeningResultExplanation">
+                            Hãy xem lại các từ vựng bạn đã chọn ở trên.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="exercise-actions d-flex gap-3 justify-content-center mt-5">
+                <button class="btn btn-primary btn-lg shadow" id="btnCheckListening" onclick="checkListeningAnswers()">
+                    Kiểm tra đáp án
+                </button>
+
+                <button class="btn btn-success btn-lg shadow"
+                        id="listeningNextBtn"
+                        onclick="nextListening()"
+                        style="display:none;">
+                    Câu tiếp theo <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

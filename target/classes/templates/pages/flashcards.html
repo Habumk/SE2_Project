@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Flashcards — K-Learn</title>
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            --success-gradient: linear-gradient(135deg, #00b894, #55efc4);
+            --bg-color: #f8f9fa;
+            --text-dark: #2d3436;
+            --accent-soft: rgba(108, 92, 231, 0.1);
+            --shadow-soft: 0 10px 30px rgba(0,0,0,0.08);
+            --border-radius-lg: 20px;
+        }
+
+        #page-flashcards {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 25px;
+            text-align: center;
+            letter-spacing: -1px;
+        }
+
+        /* ===== SELECT ===== */
+        #lessonSelect {
+            width: 100%;
+            padding: 16px;
+            border-radius: 15px;
+            border: 2px solid #edf2f7;
+            margin-bottom: 30px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-dark);
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        #lessonSelect:focus {
+            border-color: #6c5ce7;
+            outline: none;
+            box-shadow: 0 0 0 4px var(--accent-soft);
+        }
+
+        /* ===== PROGRESS ===== */
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            height: 14px;
+            background: #e2e8f0;
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-gradient);
+            border-radius: 50px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 10px;
+            color: #6c5ce7;
+            text-transform: uppercase;
+        }
+
+        /* ===== FLASHCARD ===== */
+        .flashcard {
+            width: 100%;
+            max-width: 550px;
+            height: 360px;
+            margin: 40px auto;
+            perspective: 1500px;
+        }
+
+        .flashcard-inner {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--border-radius-lg);
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: var(--shadow-soft);
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .flashcard-face.front {
+            background: var(--primary-gradient);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .flashcard-face.back {
+            background: var(--success-gradient);
+            transform: rotateY(180deg);
+        }
+
+        /* ===== TEXT TRONG CARD ===== */
+        .hangul-text {
+            font-size: 64px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .romanization {
+            color: white
+            font-size: 18px;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .meaning {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .example {
+            font-size: 15px;
+            background: rgba(0,0,0,0.05);
+            padding: 15px;
+            border-radius: 12px;
+            line-height: 1.6;
+            max-width: 90%;
+        }
+
+        /* ===== AUDIO BUTTON ===== */
+        .audio-btn {
+            background: white;
+            color: #6c5ce7;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-top: 15px;
+        }
+
+        .audio-btn:hover {
+            transform: scale(1.1);
+            background: #f1f2f6;
+        }
+
+        /* ===== NAV BUTTONS ===== */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .nav-buttons button {
+            flex: 1;
+            max-width: 150px;
+            padding: 14px;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .nav-buttons button:first-child {
+            background: #fff;
+            color: #636e72;
+            border: 2px solid #edf2f7;
+        }
+
+        .nav-buttons button:last-child {
+            background: var(--text-dark);
+            color: white;
+        }
+
+        .nav-buttons button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-buttons button:active {
+            transform: translateY(0);
+        }
+
+        /* ===== EMPTY/LOADING STATE ===== */
+        #flashcard-container p {
+            text-align: center;
+            color: #b2bec3;
+            font-style: italic;
+            margin: 50px 0;
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <section id="page-flashcards">
+
+        <h2>Flashcards <span style="color: #6c5ce7;">플래시카드</span></h2>
+
+        <select id="lessonSelect" onchange="loadFlashcardsByLesson()">
+            <option value="">-- Chọn bài học để bắt đầu --</option>
+        </select>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0 / 0 THẺ HOÀN THÀNH</div>
+        </div>
+
+        <div id="flashcard-container">
+            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="flashcard-face front">
+                        <div class="hangul-text">안녕하세요</div>
+                        <div class="romanization">An-nyeong-ha-se-yo</div>
+                        <button class="audio-btn">🔊</button>
+                    </div>
+                    <div class="flashcard-face back">
+                        <div class="meaning">Xin chào</div>
+                        <div class="example">"안녕하세요! 만나서 반가워요." (Xin chào! Rất vui được gặp bạn.)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <button onclick="flashcardManager.prev()">Trước</button>
+            <button onclick="flashcardManager.next()">Tiếp theo</button>
+        </div>
+
+    </section>
+</div>
+</body>
+</html>
