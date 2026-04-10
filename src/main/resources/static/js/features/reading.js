@@ -157,7 +157,8 @@ function nextReadingPassage() {
 
 // ================= AUTO INIT =================
 document.addEventListener("DOMContentLoaded", function () {
-    if (document.getElementById("page-reading")) {
+    const page = document.getElementById("page-reading");
+    if (page && page.dataset.renderMode !== 'server') {
         initReading();
     }
 });

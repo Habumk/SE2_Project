@@ -3,221 +3,45 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 <head>
-    <title>Bảng xếp hạng — K-Learn</title>
-    <style>
-        :root {
-            --gold: #FFD700;
-            --silver: #C0C0C0;
-            --bronze: #CD7F32;
-            --primary: #6c5ce7;
-            --bg-soft: #f8f9fa;
-        }
-
-        #page-leaderboard {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
-            font-family: 'Inter', system-ui, sans-serif;
-        }
-
-        .page-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .page-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #2d3436;
-            margin-bottom: 10px;
-        }
-
-        .page-subtitle {
-            color: #636e72;
-            font-size: 1.1rem;
-        }
-
-        .exercise-container {
-            background: white;
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.02);
-        }
-
-        .section-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Table Styling */
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 12px; /* Tạo khoảng cách giữa các hàng */
-        }
-
-        th {
-            text-align: left;
-            padding: 12px 20px;
-            color: #a0aec0;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            border: none !important;
-        }
-
-        tbody tr {
-            background: #ffffff;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        tbody tr:hover {
-            transform: scale(1.01);
-            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.08);
-        }
-
-        td {
-            padding: 16px 20px;
-            border: none !important;
-        }
-
-        /* Bo góc cho hàng */
-        td:first-child { border-radius: 12px 0 0 12px; }
-        td:last-child { border-radius: 0 12px 12px 0; }
-
-        /* Hạng (Rank) styling */
-        .rank-circle {
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-weight: 800;
-            font-size: 1.1rem;
-            background: #edf2f7;
-            color: #4a5568;
-        }
-
-        .rank-1 .rank-circle { background: var(--gold); color: #fff; box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4); }
-        .rank-2 .rank-circle { background: var(--silver); color: #fff; }
-        .rank-3 .rank-circle { background: var(--bronze); color: #fff; }
-
-        /* User Info */
-        .user-name {
-            font-weight: 700;
-            color: #2d3436;
-            font-size: 1.05rem;
-        }
-
-        .level-badge {
-            background: rgba(108, 92, 231, 0.1);
-            color: var(--primary);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-
-        .xp-text {
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .streak-fire {
-            color: #ff7675;
-            font-weight: 600;
-        }
-
-        /* Loading animation */
-        #leaderboardLoading {
-            text-align: center;
-            padding: 40px;
-            font-weight: 600;
-            color: #b2bec3;
-        }
-
-        @media (max-width: 600px) {
-            .exercise-container { padding: 15px; }
-            th:nth-child(3), td:nth-child(3) { display: none; } /* Ẩn cột cấp trên mobile */
-        }
-    </style>
+    <title>Bang xep hang - K-Learn</title>
 </head>
 <body>
 <div layout:fragment="content">
     <section class="page active" id="page-leaderboard">
         <div class="page-header">
-            <div>
-                <h2 class="page-title">🏅 Bảng xếp hạng</h2>
-                <p class="page-subtitle">Vinh danh những chiến binh K-Learn chăm chỉ nhất!</p>
-            </div>
+            <h2 class="page-title">Bang xep hang</h2>
+            <p class="page-subtitle">Du lieu duoc render truc tiep tu Spring MVC va Thymeleaf</p>
         </div>
 
         <div class="exercise-container">
-            <div class="section-title">
-                <span>🔥 Top học viên xuất sắc</span>
+            <div th:if="${entries == null || #lists.isEmpty(entries)}" style="color:#64748b;">
+                Chua co du lieu bang xep hang.
             </div>
 
-            <div id="leaderboardLoading">Đang tính toán thứ hạng...</div>
-
-            <div id="leaderboardTable" style="display:none;">
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Hạng</th>
-                            <th>Người học</th>
-                            <th>Cấp độ</th>
-                            <th style="text-align:right;">Tổng XP</th>
-                            <th style="text-align:right;">Chuỗi (Streak)</th>
-                        </tr>
-                        </thead>
-                        <tbody id="leaderboardBody"></tbody>
-                    </table>
-                </div>
+            <div th:if="${entries != null && !#lists.isEmpty(entries)}" style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse;">
+                    <thead>
+                    <tr>
+                        <th style="text-align:left; padding:12px;">Hang</th>
+                        <th style="text-align:left; padding:12px;">Nguoi hoc</th>
+                        <th style="text-align:left; padding:12px;">Cap do</th>
+                        <th style="text-align:right; padding:12px;">Tong XP</th>
+                        <th style="text-align:right; padding:12px;">Streak</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="entry : ${entries}" style="border-top:1px solid #e5e7eb;">
+                        <td style="padding:14px 12px;" th:text="${entry.rank}">1</td>
+                        <td style="padding:14px 12px;" th:text="${entry.name}">Hoc vien</td>
+                        <td style="padding:14px 12px;">LV. <span th:text="${entry.currentLevel}">1</span></td>
+                        <td style="padding:14px 12px; text-align:right;" th:text="${entry.totalXp}">0</td>
+                        <td style="padding:14px 12px; text-align:right;"> <span th:text="${entry.streakCount}">0</span></td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>
-
-    <script th:inline="javascript">
-        (async function loadLeaderboard() {
-            const loadingEl = document.getElementById('leaderboardLoading');
-            const tableEl = document.getElementById('leaderboardTable');
-            try {
-                const res = await fetch('/api/leaderboard');
-                const payload = await res.json();
-                const entries = payload && payload.data ? payload.data : [];
-
-                const tbody = document.getElementById('leaderboardBody');
-                tbody.innerHTML = entries.map((e, i) => {
-                    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
-                    return `
-                        <tr class="${rankClass}">
-                            <td><div class="rank-circle">${i + 1}</div></td>
-                            <td><span class="user-name">${e.name || 'Học viên ẩn danh'}</span></td>
-                            <td><span class="level-badge">LV. ${e.currentLevel ?? 1}</span></td>
-                            <td style="text-align:right;"><span class="xp-text">${(e.totalXp ?? 0).toLocaleString()} XP</span></td>
-                            <td style="text-align:right;"><span class="streak-fire">🔥 ${e.streakCount ?? 0}</span></td>
-                        </tr>
-                    `;
-                }).join('');
-
-                loadingEl.style.display = 'none';
-                tableEl.style.display = 'block';
-            } catch (e) {
-                console.error(e);
-                if (loadingEl) loadingEl.textContent = 'Ồ! Có lỗi khi tải dữ liệu. Thử lại sau nhé!';
-            }
-        })();
-    </script>
 </div>
 </body>
 </html>

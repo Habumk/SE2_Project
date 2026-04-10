@@ -3,320 +3,64 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 <head>
-    <title>Hồ sơ - K-Learn</title>
-    <style>
-        /* ═══════════════════════════════════════════════════
-           K-LEARN PROFILE REFRESH - DASHBOARD STYLE
-        ═══════════════════════════════════════════════════ */
-        :root {
-            --profile-primary: #6366f1; /* Indigo hiện đại */
-            --profile-bg: #f8fafc;
-            --r-xl: 24px;
-            --r-lg: 16px;
-        }
-
-        #page-profile {
-            max-width: 900px;
-            margin: auto;
-            padding: 40px 20px;
-            font-family: 'Pretendard', system-ui, sans-serif;
-        }
-
-        /* HEADER */
-        .page-header h1 {
-            font-size: 2rem;
-            font-weight: 900;
-            color: #1e293b;
-            margin-bottom: 8px;
-        }
-
-        .page-header p {
-            color: #64748b;
-            font-size: 1.1rem;
-        }
-
-        .profile-container {
-            display: grid;
-            gap: 25px;
-            margin-top: 35px;
-        }
-
-        /* USER CARD */
-        .profile-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: var(--r-xl);
-            padding: 40px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            color: white;
-            border-radius: 30px; /* Bo góc kiểu Squircle */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 42px;
-            font-weight: 800;
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
-        }
-
-        .profile-info h2 {
-            margin: 0 0 5px 0;
-            font-size: 24px;
-            font-weight: 800;
-            color: #1e293b;
-        }
-
-        .profile-info p {
-            margin: 0 0 20px 0;
-            color: #94a3b8;
-            font-weight: 500;
-        }
-
-        /* STATS CHIPS */
-        .profile-stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .stat {
-            background: #f1f5f9;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 700;
-            color: #475569;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-
-        .stat:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
-
-        /* BADGES SECTION */
-        .badges-section, .settings-section {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: var(--r-xl);
-            padding: 30px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-        }
-
-        .badges-section h3, .settings-section h3 {
-            font-size: 18px;
-            font-weight: 800;
-            color: #1e293b;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .badges-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 15px;
-        }
-
-        .badge-item {
-            text-align: center;
-            padding: 20px 10px;
-            border-radius: var(--r-lg);
-            background: #f8fafc;
-            border: 1px solid #f1f5f9;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: help;
-        }
-
-        .badge-item.earned {
-            background: white;
-            border-color: #e0e7ff;
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1);
-        }
-
-        .badge-item.earned .badge-icon {
-            filter: drop-shadow(0 5px 10px rgba(99, 102, 241, 0.2));
-        }
-
-        .badge-item.earned .badge-name {
-            color: #4338ca;
-        }
-
-        .badge-item.earned:hover {
-            transform: translateY(-5px) scale(1.05);
-            border-color: #6366f1;
-        }
-
-        .badge-item.not-earned {
-            opacity: 0.5;
-            filter: grayscale(1);
-        }
-
-        .badge-icon {
-            font-size: 36px;
-            margin-bottom: 12px;
-        }
-
-        .badge-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: #64748b;
-        }
-
-        /* SETTINGS */
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .setting-item:last-child { border-bottom: none; }
-
-        .setting-item label {
-            font-weight: 700;
-            color: #475569;
-        }
-
-        .setting-item select {
-            padding: 10px 16px;
-            border: 2px solid #f1f5f9;
-            border-radius: 12px;
-            background: white;
-            font-weight: 600;
-            color: #1e293b;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .setting-item select:focus {
-            outline: none;
-            border-color: var(--profile-primary);
-        }
-
-        .loading-placeholder {
-            grid-column: 1 / -1;
-            text-align: center;
-            color: #94a3b8;
-            padding: 40px;
-            font-style: italic;
-        }
-
-        @media (max-width: 600px) {
-            .profile-header { flex-direction: column; text-align: center; }
-            .profile-stats { justify-content: center; }
-        }
-    </style>
+    <title>Ho so - K-Learn</title>
 </head>
 <body>
 <div layout:fragment="content">
-    <section id="page-profile">
+    <section id="page-profile" class="page active">
         <div class="page-header">
-            <h1>Hồ sơ của tôi</h1>
-            <p>Theo dõi hành trình chinh phục tiếng Hàn của bạn</p>
+            <h2 class="page-title">Ho so cua toi</h2>
+            <p class="page-subtitle">Thong tin tai khoan va thanh tich hoc tap</p>
         </div>
 
-        <div class="profile-container">
-            <div class="profile-card">
-                <div class="profile-header">
-                    <div class="profile-avatar" th:text="${user != null ? user.name.substring(0,1).toUpperCase() : 'U'}">U</div>
-                    <div class="profile-info">
-                        <h2 th:text="${user != null ? user.name : 'Học viên'}">Học viên</h2>
-                        <p th:text="${user != null ? user.email : 'email@example.com'}">email@example.com</p>
-                        <div class="profile-stats">
-                            <span class="stat">🎓 Cấp <span th:text="${user != null ? user.currentLevel : 1}">1</span></span>
-                            <span class="stat">⭐ <span th:text="${user != null ? user.totalXp : 0}">0</span> XP</span>
-                            <span class="stat">🔥 <span th:text="${user != null ? user.streakCount : 0}">0</span> ngày</span>
+        <div class="exercise-container" style="display:grid; gap:24px;">
+            <section class="card" style="padding:24px; border-radius:20px; background:#fff;">
+                <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap;">
+                    <div style="width:88px; height:88px; border-radius:24px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#2563eb,#7c3aed); color:#fff; font-size:36px; font-weight:800;"
+                         th:text="${user != null ? user.name.substring(0,1).toUpperCase() : 'U'}">U</div>
+                    <div style="display:grid; gap:8px;">
+                        <h3 style="margin:0; font-size:28px;" th:text="${user != null ? user.name : 'Hoc vien'}">Hoc vien</h3>
+                        <div style="color:#64748b;" th:text="${user != null ? user.email : 'email@example.com'}">email@example.com</div>
+                        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                            <span class="status-badge status-in-progress">Cap <span th:text="${user != null ? user.currentLevel : 1}">1</span></span>
+                            <span class="status-badge status-completed"><span th:text="${user != null ? user.totalXp : 0}">0</span> XP</span>
+                            <span class="status-badge status-not-started">Streak <span th:text="${user != null ? user.streakCount : 0}">0</span> ngay</span>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="badges-section">
-                <h3>🏅 Huy hiệu đạt được</h3>
-                <div class="badges-grid" id="badgesGrid">
-                    <div class="loading-placeholder">Đang kiểm tra thành tích...</div>
+            <section class="card" style="padding:24px; border-radius:20px; background:#fff;">
+                <h3 class="section-title">Huy hieu da mo khoa</h3>
+                <div th:if="${earnedBadges == null || #lists.isEmpty(earnedBadges)}" style="color:#64748b;">
+                    Chua co huy hieu nao duoc mo khoa.
                 </div>
-            </div>
+                <div th:if="${earnedBadges != null && !#lists.isEmpty(earnedBadges)}"
+                     style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px;">
+                    <div th:each="badge : ${earnedBadges}"
+                         style="padding:16px; border:1px solid #dbeafe; border-radius:16px; background:#f8fbff;">
+                        <div style="font-size:28px; margin-bottom:10px;">T</div>
+                        <div style="font-weight:700; margin-bottom:6px;" th:text="${badge.name}">Badge</div>
+                        <div style="font-size:14px; color:#64748b;" th:text="${badge.description}">Description</div>
+                    </div>
+                </div>
+            </section>
 
-            <div class="settings-section">
-                <h3>⚙️ Cài đặt tài khoản</h3>
-                <div class="setting-item">
-                    <label>Chủ đề hiển thị</label>
-                    <select id="themeSelect" onchange="updateTheme(this.value)">
-                        <option value="light">Chế độ Sáng</option>
-                        <option value="dark">Chế độ Tối</option>
+            <section class="card" style="padding:24px; border-radius:20px; background:#fff;">
+                <h3 class="section-title">Cai dat tai khoan</h3>
+                <div style="display:flex; justify-content:space-between; gap:16px; align-items:center; flex-wrap:wrap;">
+                    <label for="themeSelect" style="font-weight:700;">Chu de hien thi</label>
+                    <select id="themeSelect" onchange="updateTheme(this.value)" style="padding:10px 14px; border-radius:12px; border:1px solid #cbd5e1;">
+                        <option value="light" th:selected="${user == null || user.theme == 'light'}">Che do sang</option>
+                        <option value="dark" th:selected="${user != null && user.theme == 'dark'}">Che do toi</option>
                     </select>
                 </div>
-                <div class="setting-item">
-                    <label>Thông báo học tập</label>
-                    <span style="color: #94a3b8; font-size: 14px;">Bật theo mặc định</span>
-                </div>
-            </div>
+            </section>
         </div>
     </section>
-
-    <script th:inline="javascript">
-        // Logic JS giữ nguyên như cũ để đảm bảo không lỗi
-        document.addEventListener('DOMContentLoaded', () => {
-            fetch('/api/users/me/badges')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        renderBadges(data.data);
-                    }
-                })
-                .catch(error => {
-                    console.error('Failed to load badges:', error);
-                });
-
-            const currentTheme = /*[[${user != null ? user.theme : 'light'}]]*/ 'light';
-            document.getElementById('themeSelect').value = currentTheme;
-        });
-
-        function renderBadges(badges) {
-            const grid = document.getElementById('badgesGrid');
-            const allBadges = [
-                { id: 1, name: 'First Step', icon: '👟', condition: 'Hoàn thành bài học đầu tiên' },
-                { id: 2, name: 'Lesson x5', icon: '📚', condition: 'Hoàn thành 5 bài học' },
-                { id: 3, name: 'Lesson x10', icon: '🎓', condition: 'Hoàn thành 10 bài học' },
-                { id: 4, name: 'Course Pro', icon: '🏆', condition: 'Hoàn thành 1 khóa học' },
-                { id: 5, name: 'Started', icon: '🔥', condition: 'Streak 3 ngày' },
-                { id: 6, name: 'Warrior', icon: '💪', condition: 'Streak 7 ngày' },
-                { id: 7, name: 'Dedicated', icon: '⭐', condition: 'Streak 30 ngày' },
-                { id: 8, name: 'XP Rookie', icon: '🌟', condition: 'Đạt 100 XP' },
-                { id: 9, name: 'XP Pro', icon: '💎', condition: 'Đạt 500 XP' },
-                { id: 10, name: 'Perfect', icon: '🎤', condition: 'Phát âm chuẩn 100%' }
-            ];
-
-            const earnedBadgeIds = badges.map(b => b.badgeId);
-            grid.innerHTML = allBadges.map(badge => {
-                const earned = earnedBadgeIds.includes(badge.id);
-                return `
-                    <div class="badge-item ${earned ? 'earned' : 'not-earned'}" title="${badge.condition}">
-                        <div class="badge-icon">${badge.icon}</div>
-                        <div class="badge-name">${badge.name}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
+</div>
+<th:block layout:fragment="pageScripts">
+    <script>
         function updateTheme(theme) {
             if (window.toggleDarkMode) {
                 const current = document.documentElement.getAttribute('data-theme') || 'light';
@@ -326,6 +70,6 @@
             }
         }
     </script>
-</div>
+</th:block>
 </body>
 </html>

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -100,5 +101,12 @@ public class BadgeService {
         }
 
         return newlyEarned;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Badge> getUserBadges(Long userId) {
+        return userBadgeRepository.findByUser_UserId(userId).stream()
+            .map(UserBadge::getBadge)
+            .collect(Collectors.toList());
     }
 }

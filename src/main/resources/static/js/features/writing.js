@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("Lesson ID:", lessonId);
 
-    if (lessonId) loadWriting(lessonId);
+    if (lessonId && el?.dataset.renderMode !== 'server') loadWriting(lessonId);
 });
 
 window.initWriting = initWriting;

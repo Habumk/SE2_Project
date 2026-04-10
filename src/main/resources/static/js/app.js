@@ -7,9 +7,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Lấy lessonId từ thuộc tính data của body (đã định nghĩa ở file HTML)
     const lessonId = document.body.getAttribute("data-lesson-id");
+    const activePage = document.querySelector('.page.active');
+    const isServerRenderedPage = activePage?.dataset.renderMode === 'server';
 
     // 2. Kiểm tra nếu đang ở trang Listening thì mới chạy loadListening
-    if (document.getElementById("page-listening")) {
+    if (document.getElementById("page-listening") && !isServerRenderedPage) {
         if (lessonId) {
             loadListening(lessonId);
         } else {
@@ -44,14 +46,15 @@ async function initApp() {
     const pageId = document.querySelector('.page.active');
     if (pageId) {
         const page = pageId.id.replace('page-', '');
+        const isServerRendered = pageId.dataset.renderMode === 'server';
         switch (page) {
             case 'hangul': renderHangul(); break;
             case 'vocabulary': renderVocabulary(); break;
             case 'grammar': renderGrammar(); break;
-            case 'listening': initListening(); break;
-            case 'speaking': initSpeaking(); break;
-            case 'reading': initReading(); break;
-            case 'writing': initWriting(); break;
+            case 'listening': if (!isServerRendered) initListening(); break;
+            case 'speaking': if (!isServerRendered) initSpeaking(); break;
+            case 'reading': if (!isServerRendered) initReading(); break;
+            case 'writing': if (!isServerRendered) initWriting(); break;
             case 'flashcards': initFlashcards(); break;
             case 'quiz': resetQuizUI(); break;
             case 'roadmap': if(typeof renderRoadmap === 'function') renderRoadmap(); break;

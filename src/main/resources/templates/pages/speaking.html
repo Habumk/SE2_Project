@@ -2,216 +2,167 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
-<head><title>Luyện Nói — K-Learn</title>
-    <style>
-        /* ═══════════════════════════════════════════════════
-           K-LEARN SPEAKING REFRESH
-        ═══════════════════════════════════════════════════ */
-        :root {
-            --speaking-primary: #10b981; /* Màu xanh lá năng động */
-            --speaking-bg: #f0fdf4;
-            --speaking-shadow: 0 15px 35px rgba(16, 185, 129, 0.15);
-        }
-
-        #page-speaking {
-            max-width: 800px;
-            margin: auto;
-            padding: 40px 20px;
-            font-family: 'Pretendard', system-ui, sans-serif;
-        }
-
-        /* ── PROMPT CARD ── */
-        .speaking-prompt {
-            background: white;
-            border-radius: 30px;
-            padding: 45px 30px;
-            text-align: center;
-            border: 2px solid #f1f5f9;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
-            margin-bottom: 40px;
-            position: relative;
-        }
-
-        .speaking-label {
-            font-size: 14px;
-            font-weight: 700;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 20px;
-        }
-
-        .speaking-text-kr {
-            font-family: 'Noto Serif KR', serif;
-            font-size: 42px;
-            font-weight: 900;
-            color: #1e293b;
-            margin-bottom: 10px;
-        }
-
-        .speaking-text-roman {
-            font-size: 18px;
-            color: var(--speaking-primary);
-            font-weight: 600;
-            margin-bottom: 5px;
-            opacity: 0.8;
-        }
-
-        .speaking-text-vi {
-            font-size: 16px;
-            color: #64748b;
-            font-style: italic;
-        }
-
-        .btn-speak {
-            margin-top: 25px;
-            width: 54px;
-            height: 54px;
-            border-radius: 50%;
-            border: none;
-            background: #f1f5f9;
-            color: #475569;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-speak:hover {
-            background: #e2e8f0;
-            transform: scale(1.1);
-        }
-
-        /* ── RECORDER SECTION ── */
-        .speaking-recorder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 25px;
-        }
-
-        .btn-record {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: none;
-            background: var(--speaking-primary);
-            color: white;
-            font-size: 32px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-        }
-
-        .btn-record:hover { transform: scale(1.05); }
-        .btn-record.recording {
-            background: #ef4444;
-            box-shadow: 0 0 0 15px rgba(239, 68, 68, 0.1);
-            animation: pulse-red 1.5s infinite;
-        }
-
-        @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-
-        #recordText {
-            font-weight: 800;
-            color: #475569;
-            font-size: 15px;
-        }
-
-        /* ── RESULT & SCORE ── */
-        .speaking-result {
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 25px;
-            width: 100%;
-            text-align: center;
-            border: 1px dashed #cbd5e1;
-            animation: slideUp 0.4s ease;
-        }
-
-        @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-
-        .speaking-result-text {
-            font-size: 24px;
-            font-weight: 800;
-            color: #1e293b;
-            margin: 10px 0;
-        }
-
-        .speaking-score {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: 900;
-            font-size: 20px;
-            color: white;
-            background: var(--speaking-primary);
-        }
-
-        /* ── ACTIONS ── */
-        .exercise-actions {
-            margin-top: 50px;
-            text-align: center;
-        }
-
-        .btn-secondary {
-            background: white;
-            border: 2px solid #e2e8f0;
-            padding: 14px 35px;
-            border-radius: 15px;
-            font-weight: 700;
-            color: #64748b;
-            transition: 0.2s;
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--speaking-primary);
-            color: var(--speaking-primary);
-        }
-    </style></head>
+<head>
+    <title th:text="${lesson.title + ' - Speaking'}">Speaking - K-Learn</title>
+</head>
 <body th:attr="data-lesson-id=${lesson.lessonId}">
 <div layout:fragment="content">
-<section class="page active" id="page-speaking">
-    <div class="page-header">
-        <div>
-            <h2 class="page-title">Luyện Nói 말하기</h2>
-            <p class="page-subtitle">Luyện phát âm tiếng Hàn</p>
+    <section id="page-speaking" class="page active" data-render-mode="server">
+        <div class="page-header">
+            <h2 class="page-title" th:text="${lesson.title}">Lesson</h2>
+            <p class="page-subtitle">Speaking prompt da duoc render san, JS chi con xu ly phat am va ghi am.</p>
         </div>
-    </div>
-    <div class="exercise-container">
-        <div class="speaking-prompt">
-            <p class="speaking-label">Hãy nói lại câu sau:</p>
-            <div class="speaking-text-kr" id="speakingTextKr">안녕하세요</div>
-            <div class="speaking-text-roman" id="speakingTextRoman">annyeonghaseyo</div>
-            <div class="speaking-text-vi" id="speakingTextVi">Xin chào</div>
-            <button class="btn-speak" onclick="speakKorean(document.getElementById('speakingTextKr').textContent)" aria-label="Nghe mẫu">🔊</button>
-        </div>
-        <div class="speaking-recorder">
-            <button class="btn-record" id="recordBtn" onclick="toggleRecording()">
-                <span class="record-icon" id="recordIcon">🎤</span>
-                <span id="recordText">Nhấn để ghi âm</span>
-            </button>
-            <div class="recording-indicator" id="recordingIndicator" style="display:none;">
-                <div class="pulse-dot"></div><span>Đang ghi âm...</span>
+
+        <div class="exercise-container" style="display:grid; gap:24px;">
+            <div th:if="${#lists.isEmpty(speakingPrompts)}" class="card"
+                 style="padding:24px; border-radius:20px; background:#fff; color:#64748b;">
+                Chua co bai speaking cho lesson nay.
             </div>
-            <div class="speaking-result" id="speakingResult" style="display:none;">
-                <p class="speaking-result-label">Bạn đã nói:</p>
-                <p class="speaking-result-text" id="speakingResultText"></p>
-                <div class="speaking-score" id="speakingScore"></div>
-            </div>
+
+            <section th:each="prompt, promptStat : ${speakingPrompts}"
+                     class="card"
+                     th:attr="data-speaking-card=${prompt.id}, data-target-text=${prompt.kr}"
+                     style="padding:24px; border-radius:20px; background:#fff; display:grid; gap:18px;">
+                <div style="display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+                    <div>
+                        <div class="status-badge status-completed">
+                            Prompt <span th:text="${promptStat.count}">1</span>/<span th:text="${#lists.size(speakingPrompts)}">1</span>
+                        </div>
+                        <h3 style="margin:12px 0 6px; font-size:28px;" th:text="${prompt.kr}">안녕하세요</h3>
+                        <div style="color:#16a34a; font-weight:700;" th:text="${prompt.roman}">annyeonghaseyo</div>
+                        <div style="color:#64748b; margin-top:6px;" th:text="${prompt.vi}">Xin chao</div>
+                    </div>
+                    <button type="button"
+                            class="btn btn-secondary"
+                            th:attr="data-speaking-audio=${prompt.kr}">
+                        Nghe mau
+                    </button>
+                </div>
+
+                <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+                    <button type="button" class="btn btn-primary" data-record-speaking-inline>
+                        Bat dau ghi am
+                    </button>
+                    <div data-speaking-status style="color:#64748b;">Nhan nut de doc lai cau mau.</div>
+                </div>
+
+                <div style="display:grid; gap:10px;">
+                    <label style="font-weight:700;">Van ban nhan dien</label>
+                    <textarea rows="2" data-speaking-transcript
+                              style="padding:14px 16px; border-radius:14px; border:1px solid #dbe2ea; resize:vertical;"></textarea>
+                </div>
+
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-secondary" data-check-speaking>
+                        So sanh ket qua
+                    </button>
+                    <div data-speaking-result
+                         style="display:none; padding:12px 16px; border-radius:14px; background:#ecfdf5; color:#166534; font-weight:700;">
+                    </div>
+                </div>
+            </section>
         </div>
-        <div class="exercise-actions">
-            <button class="btn btn-secondary" onclick="nextSpeakingPrompt()">Câu khác →</button>
-        </div>
-    </div>
-</section>
+    </section>
 </div>
+<th:block layout:fragment="pageScripts">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-speaking-audio]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    if (window.speakKorean) {
+                        window.speakKorean(button.dataset.speakingAudio);
+                    }
+                });
+            });
+
+            document.querySelectorAll('[data-record-speaking-inline]').forEach((button) => {
+                let recognition = null;
+                let recording = false;
+
+                button.addEventListener('click', () => {
+                    const card = button.closest('[data-speaking-card]');
+                    const transcript = card.querySelector('[data-speaking-transcript]');
+                    const status = card.querySelector('[data-speaking-status]');
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+                    if (!SpeechRecognition) {
+                        status.textContent = 'Trinh duyet hien tai khong ho tro speech recognition.';
+                        status.style.color = '#dc2626';
+                        return;
+                    }
+
+                    if (recording && recognition) {
+                        recognition.stop();
+                        return;
+                    }
+
+                    recognition = new SpeechRecognition();
+                    recognition.lang = 'ko-KR';
+                    recognition.interimResults = false;
+                    recognition.maxAlternatives = 1;
+
+                    recognition.onstart = () => {
+                        recording = true;
+                        button.textContent = 'Dung ghi am';
+                        status.textContent = 'Dang ghi am...';
+                        status.style.color = '#2563eb';
+                    };
+
+                    recognition.onresult = (event) => {
+                        transcript.value = event.results[0][0].transcript || '';
+                    };
+
+                    recognition.onerror = () => {
+                        recording = false;
+                        button.textContent = 'Bat dau ghi am';
+                        status.textContent = 'Khong nhan dien duoc giong noi. Thu lai.';
+                        status.style.color = '#dc2626';
+                    };
+
+                    recognition.onend = () => {
+                        recording = false;
+                        button.textContent = 'Bat dau ghi am';
+                        if (status.textContent === 'Dang ghi am...') {
+                            status.textContent = 'Da xong. Ban co the so sanh ket qua.';
+                            status.style.color = '#166534';
+                        }
+                    };
+
+                    recognition.start();
+                });
+            });
+
+            document.querySelectorAll('[data-check-speaking]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const card = button.closest('[data-speaking-card]');
+                    const target = (card.dataset.targetText || '').replace(/\s+/g, '');
+                    const actual = (card.querySelector('[data-speaking-transcript]').value || '').trim().replace(/\s+/g, '');
+                    const result = card.querySelector('[data-speaking-result]');
+
+                    if (!actual) {
+                        result.style.display = 'block';
+                        result.style.background = '#fee2e2';
+                        result.style.color = '#991b1b';
+                        result.textContent = 'Chua co noi dung ghi am de so sanh.';
+                        return;
+                    }
+
+                    let matches = 0;
+                    for (const char of actual) {
+                        if (target.includes(char)) {
+                            matches += 1;
+                        }
+                    }
+
+                    const score = target.length === 0 ? 0 : Math.round((matches / target.length) * 100);
+                    result.style.display = 'block';
+                    result.style.background = score >= 70 ? '#ecfdf5' : '#fffbeb';
+                    result.style.color = score >= 70 ? '#166534' : '#b45309';
+                    result.textContent = `Do tuong dong uoc tinh: ${score}%`;
+                });
+            });
+        });
+    </script>
+</th:block>
 </body>
 </html>

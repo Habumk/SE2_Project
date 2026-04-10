@@ -20,6 +20,9 @@ public class LessonService {
     private final ExerciseRepository exerciseRepository;
     private final UserProgressRepository userProgressRepository;
     private final ReadingPassageRepository readingPassageRepository;
+    private final SpeakingExerciseRepository speakingExerciseRepository;
+    private final WritingCharRepo writingCharRepo;
+    private final WritingTranslateRepo writingTranslateRepo;
     private final StreakService streakService;
 
     // ================= BASIC =================
@@ -53,12 +56,24 @@ public class LessonService {
         return getExercisesByLessonAndType(lessonId, Exercise.ExerciseType.speaking);
     }
 
+    public List<SpeakingExercise> getSpeakingPromptsByLesson(Long lessonId) {
+        return speakingExerciseRepository.findByLesson_LessonId(lessonId);
+    }
+
     public List<ReadingPassage> getReadingPassagesByLesson(Long lessonId) {
         return readingPassageRepository.findByLesson_LessonId(lessonId);
     }
 
     public List<Exercise> getWritingExercisesByLesson(Long lessonId) {
         return getExercisesByLessonAndType(lessonId, Exercise.ExerciseType.writing);
+    }
+
+    public List<WritingCharExercise> getWritingCharExercisesByLesson(Long lessonId) {
+        return writingCharRepo.findByLesson_LessonId(lessonId);
+    }
+
+    public List<WritingTranslateExercise> getWritingTranslateExercisesByLesson(Long lessonId) {
+        return writingTranslateRepo.findByLesson_LessonId(lessonId);
     }
 
     // ================= PROGRESS =================

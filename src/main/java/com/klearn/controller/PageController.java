@@ -2,6 +2,8 @@ package com.klearn.controller;
 
 import com.klearn.model.User;
 import com.klearn.model.UserProgress;
+import com.klearn.repository.GrammarLessonRepository;
+import com.klearn.repository.HangulCharacterRepository;
 import com.klearn.repository.UserProgressRepository;
 import com.klearn.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,6 +18,8 @@ public class PageController {
 
     private final AuthService authService;
     private final UserProgressRepository userProgressRepository;
+    private final HangulCharacterRepository hangulCharacterRepository;
+    private final GrammarLessonRepository grammarLessonRepository;
 
     @GetMapping("/legacy-home")
     public String home() {
@@ -35,6 +37,10 @@ public class PageController {
     public String hangul(Authentication auth, Model model) {
         addUserToModel(auth, model);
         model.addAttribute("currentPage", "hangul");
+        model.addAttribute("consonants", hangulCharacterRepository.findByTypeOrderByIdAsc("consonants"));
+        model.addAttribute("vowels", hangulCharacterRepository.findByTypeOrderByIdAsc("vowels"));
+        model.addAttribute("doubleConsonants", hangulCharacterRepository.findByTypeOrderByIdAsc("double"));
+        model.addAttribute("compoundVowels", hangulCharacterRepository.findByTypeOrderByIdAsc("compound"));
         return "pages/hangul";
     }
 
@@ -42,21 +48,10 @@ public class PageController {
     public String grammar(Authentication auth, Model model) {
         addUserToModel(auth, model);
         model.addAttribute("currentPage", "grammar");
+        model.addAttribute("grammarLessons", grammarLessonRepository.findAll());
         return "pages/grammar";
     }
 
-    @GetMapping("/lessons/{lessonId}/listening")
-    public String listening(@PathVariable Long lessonId,
-                            Authentication auth,
-                            Model model) {
-
-        addUserToModel(auth, model);
-
-        model.addAttribute("lessonId", lessonId);
-        model.addAttribute("currentPage", "listening");
-
-        return "pages/listening";
-    }
     @GetMapping("/speaking")
     public String speaking(Authentication auth, Model model) {
         addUserToModel(auth, model);
@@ -69,19 +64,6 @@ public class PageController {
         addUserToModel(auth, model);
         model.addAttribute("currentPage", "reading");
         return "pages/reading";
-    }
-
-    @GetMapping("/lessons/{lessonId}/writing")
-    public String writing(@PathVariable Long lessonId,
-                          Authentication auth,
-                          Model model) {
-
-        addUserToModel(auth, model);
-        model.addAttribute("currentPage", "writing");
-
-        model.addAttribute("lessonId", lessonId); // 🔥 KEY
-
-        return "pages/writing";
     }
 
     @GetMapping("/flashcards")

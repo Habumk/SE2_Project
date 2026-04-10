@@ -279,9 +279,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+    const page = document.getElementById('page-speaking');
     const lessonId = document.body.getAttribute('data-lesson-id');
 
-    if (lessonId) {
+    if (lessonId && page?.dataset.renderMode !== 'server') {
         loadSpeaking(lessonId);
     }
 });

@@ -2,24 +2,42 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
-<head><title>Ngữ pháp — K-Learn</title></head>
+<head>
+    <title>Ngu phap - K-Learn</title>
+</head>
 <body>
 <div layout:fragment="content">
-<section class="page active" id="page-grammar">
-    <div class="page-header">
-        <div>
-            <h2 class="page-title">Ngữ pháp 문법</h2>
-            <p class="page-subtitle">Học ngữ pháp tiếng Hàn từ cơ bản đến nâng cao</p>
+    <section class="page active" id="page-grammar">
+        <div class="page-header">
+            <h2 class="page-title">Ngu phap</h2>
+            <p class="page-subtitle">Render truoc tu Spring MVC, JS chi con vai tro bo tro</p>
         </div>
-    </div>
-    <div class="grammar-list" id="grammarList"></div>
-    <div class="modal-overlay" id="grammarModal" style="display:none;">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeGrammarModal()" aria-label="Đóng">&times;</button>
-            <div id="grammarModalBody"></div>
+
+        <div class="exercise-container" style="display:grid; gap:20px;">
+            <div th:if="${grammarLessons == null || #lists.isEmpty(grammarLessons)}" style="color:#64748b;">
+                Chua co bai hoc ngu phap nao.
+            </div>
+
+            <details th:each="lesson : ${grammarLessons}" open
+                     style="padding:20px; border-radius:18px; background:#fff; border:1px solid #e5e7eb;">
+                <summary style="cursor:pointer; list-style:none;">
+                    <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap;">
+                        <div>
+                            <div style="font-size:20px; font-weight:700;" th:text="${lesson.title}">Title</div>
+                            <div style="color:#64748b;" th:text="${lesson.desc}">Description</div>
+                        </div>
+                        <span class="status-badge status-in-progress" th:text="${lesson.level}">Level</span>
+                    </div>
+                </summary>
+
+                <div style="margin-top:16px; color:#334155;" th:utext="${lesson.content}"></div>
+                <div th:if="${lesson.examples != null && !lesson.examples.isBlank()}"
+                     style="margin-top:16px; padding:16px; background:#f8fafc; border-radius:14px; overflow:auto;">
+                    <pre style="white-space:pre-wrap; margin:0;" th:text="${lesson.examples}"></pre>
+                </div>
+            </details>
         </div>
-    </div>
-</section>
+    </section>
 </div>
 </body>
 </html>

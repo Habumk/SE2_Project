@@ -14,6 +14,7 @@
           rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <link rel="stylesheet" th:href="@{/css/dark-mode.css}">
+    <th:block layout:fragment="pageStyles"></th:block>
 </head>
 <body>
 
@@ -206,25 +207,18 @@
     window.KLEARN_INITIAL_THEME = /*[[${user != null ? user.theme : 'light'}]]*/ 'light';
 </script>
 
-<script th:inline="javascript">
-    window.KLEARN_INITIAL_THEME = /*[[${user != null ? user.theme : 'light'}]]*/ 'light';
-</script>
-
 <!-- Core -->
 <script th:src="@{/js/dark-mode.js}" defer></script>
-<script th:src="@{/js/router.js}" defer></script>
 
 <!-- UI -->
 <script th:src="@{/js/ui/sidebar.js}" defer></script>
 <script th:src="@{/js/ui/toast.js}" defer></script>
 <script th:src="@{/js/ui/profile.js}" defer></script>
-
-<!-- 🔥 STATE + STORAGE + UTILS (PHẢI TRƯỚC FEATURES) -->
-<script th:src="@{/js/state.js}" defer></script>
-<script th:src="@{/js/storage.js}" defer></script>
 <script th:src="@{/js/utils.js}" defer></script>
 
-<!-- Features -->
+<!-- Compatibility layer for the current pages while the frontend is migrated page-by-page -->
+<script th:src="@{/js/state.js}" defer></script>
+<script th:src="@{/js/storage.js}" defer></script>
 <script th:src="@{/js/features/dashboard.js}" defer></script>
 <script th:src="@{/js/features/hangul.js}" defer></script>
 <script th:src="@{/js/features/vocabulary.js}" defer></script>
@@ -236,9 +230,7 @@
 <script th:src="@{/js/features/canvas.js}" defer></script>
 <script th:src="@{/js/features/flashcard.js}" defer></script>
 <script th:src="@{/js/features/quiz.js}" defer></script>
-
-<!-- App (LUÔN CUỐI) -->
 <script th:src="@{/js/app.js}" defer></script>
+<th:block layout:fragment="pageScripts"></th:block>
 </body>
 </html>
-www.thymeleaf.org
