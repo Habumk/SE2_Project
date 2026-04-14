@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>500 - Lỗi máy chủ - K-Learn</title>
+</head>
+<body>
+<main class="main-content" layout:fragment="content">
+    <div style="padding: 60px 40px; text-align: center;">
+        <h1 style="font-size: 128px; color: var(--danger); margin-bottom: 20px; font-weight: 800;">500</h1>
+        <h2 style="color: var(--text-primary); margin-bottom: 16px;">Lỗi máy chủ nội bộ</h2>
+        <p style="color: var(--text-secondary); font-size: 16px; margin-bottom: 32px;">Có lỗi xảy ra trên máy chủ. Vui lòng thử lại sau hoặc liên hệ với chúng tôi.</p>
+        
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <a href="/dashboard" class="btn btn-primary">📊 Dashboard</a>
+            <a href="javascript:history.back()" class="btn btn-secondary">← Quay lại</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

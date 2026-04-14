@@ -16,9 +16,10 @@ function getUserId() {
 function _toast(msg, type = 'info') {
     // app.js của layout đã định nghĩa showToast globally
     if (typeof showToast === 'function') {
-        _toast(msg, type);
+        showToast(msg, type);
     } else {
-        console.warn('[studyroom]', msg);
+        // console.warn('[studyroom]', msg);
+        // Fallback: do nothing in production
     }
 }
 
@@ -55,7 +56,7 @@ async function createRoom(event) {
     };
 
     // IN RA CONSOLE ĐỂ BẮT TẬN TAY DỮ LIỆU
-    console.log("PAYLOAD SẼ GỬI LÊN:", JSON.stringify(requestBody));
+    // console.log("PAYLOAD SẼ GỬI LÊN:", JSON.stringify(requestBody));
 
     try {
         const res = await fetch('/api/speaking-rooms', {
@@ -81,8 +82,12 @@ async function createRoom(event) {
             await _enterRoom(room, modeInput);
         }
     } catch (e) {
-        console.error("Lỗi mạng:", e);
-        _toast('Lỗi kết nối máy chủ', 'error');
+        // console.error("Lỗi mạng:", e);
+        if (e.name === 'TypeError') {
+            _toast('Lỗi kết nối mạng', 'error');
+        } else {
+            _toast('Lỗi không xác định', 'error');
+        }
     }
 }
 

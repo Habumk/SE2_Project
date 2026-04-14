@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Lỗi - K-Learn</title>
+</head>
+<body>
+<main class="main-content" layout:fragment="content">
+    <div style="padding: 60px 40px; text-align: center;">
+        <h1 style="font-size: 64px; color: var(--danger); margin-bottom: 20px;">⚠️ Lỗi</h1>
+        <h2 style="color: var(--text-primary); margin-bottom: 16px;" th:text="${message} ?: 'Một lỗi đã xảy ra'">Một lỗi đã xảy ra</h2>
+        <p style="color: var(--text-secondary); font-size: 16px; margin-bottom: 32px;" th:text="${error} ?: ''">Chi tiết lỗi</p>
+        
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <a href="/" class="btn btn-primary">🏠 Trang chủ</a>
+            <a href="javascript:history.back()" class="btn btn-secondary">← Quay lại</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

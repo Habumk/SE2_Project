@@ -188,7 +188,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script th:inline="javascript" th:if="${user != null}">
     /*<![CDATA[*/
-    window.KLEARN_USER_ID = [[${user.userId}]];
+    window.KLEARN_USER_ID = [[${user?.userId ?: null}]];
     /*]]>*/
 </script>
     <script th:src="@{/js/studyroom.js}"></script>

@@ -1,0 +1,124 @@
+spring:
+  # ========== APPLICATION NAME ==========
+  application:
+    name: k-learn
+    version: 0.0.1-SNAPSHOT
+
+  # ========== SERVER CONFIG ==========
+  server:
+    port: 8088
+    servlet:
+      session:
+        persistent: false
+        timeout: 30m
+        cookie:
+          name: JSESSIONID
+          secure: false  # Set to true in production with HTTPS
+          http-only: true
+          same-site: lax
+
+  # ========== DATABASE CONFIG ==========
+  datasource:
+    url: jdbc:mysql://localhost:3306/klearn?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: 220405
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # ========== JPA / HIBERNATE CONFIG ==========
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false  # Set to false in production
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  # ========== THYMELEAF CONFIG ==========
+  thymeleaf:
+    cache: false  # Set to true in production
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
+    mode: HTML
+    servlet:
+      content-type: text/html
+
+  # ========== STATIC RESOURCES ==========
+  web:
+    resources:
+      static-locations: classpath:/static/
+      cache:
+        period: 31536000  # 1 year in seconds
+
+  # ========== MESSAGE PROPERTIES ==========
+  messages:
+    basename: messages
+    encoding: UTF-8
+    cache-duration: 3600
+
+# ========== LOGGING CONFIG ==========
+logging:
+  level:
+    root: INFO
+    com.klearn: DEBUG
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/klearn.log
+    max-size: 10MB
+    max-history: 30
+    total-size-cap: 1GB
+
+# ========== ACTUATOR (Metrics) ==========
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# ========== CUSTOM CONFIG (K-Learn specific) ==========
+klearn:
+  jwt:
+    secret: your-secret-key-change-in-production
+    expiration: 86400000  # 24 hours in ms
+  
+  security:
+    csrf-enabled: true
+    cors:
+      allowed-origins: "http://localhost:3000,http://localhost:8088"
+      allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+      allowed-headers: "*"
+  
+  xp:
+    lesson-reward: 100
+    level-thresholds:
+      level1: 0
+      level2: 100
+      level3: 250
+      level4: 500
+      level5: 1000
+  
+  streak:
+    max-days: 999
+    reset-on-skip: true
