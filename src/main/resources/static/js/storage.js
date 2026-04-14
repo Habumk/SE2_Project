@@ -26,16 +26,9 @@ function saveState() {
 }
 
 function updateStreak() {
-    const today = new Date().toDateString();
-    if (state.lastStudyDate === today) return;
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-    if (state.lastStudyDate === yesterday) {
-        state.streak++;
-    } else if (state.lastStudyDate !== today) {
-        state.streak = 1;
-    }
-    state.lastStudyDate = today;
-    saveState();
+    // Streak is now managed server-side by StreakService
+    // Client-side streak tracking removed to avoid conflicts
+    // Server updates streak on login and lesson completion
 }
 
 window.loadState = loadState;

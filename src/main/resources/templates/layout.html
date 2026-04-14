@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
@@ -115,7 +115,7 @@
             <div id="dictSearchResults" class="search-dropdown" style="display:none;"></div>
         </div>
 
-        <div class="header-streak" id="headerStreak">🔥 <span id="headerStreakCount" th:text="${progress != null ? progress.streak : 0}">0</span></div>
+        <div class="header-streak" id="headerStreak">🔥 <span id="headerStreakCount" th:text="${user?.streakCount ?: 0}">0</span></div>
 
         <button id="theme-toggle" type="button" onclick="toggleDarkMode()" class="btn btn-secondary" style="padding:8px 12px; margin-left: 12px;">🌙</button>
 
@@ -140,7 +140,7 @@
                 <div class="profile-dropdown-divider"></div>
                 <div class="profile-dropdown-level">
                     <span>🎓</span>
-                    <span id="profileDropdownLevel">Cấp 1 · Sơ cấp</span>
+                    <span id="profileDropdownLevel" th:text="'Cấp ' + ${user?.currentLevel ?: 1} + ' · ' + ${user?.currentLevel == 1 ? 'Sơ cấp' : user?.currentLevel == 2 ? 'Trung cấp 1' : user?.currentLevel == 3 ? 'Trung cấp 2' : 'Cao cấp'}">Cấp 1 · Sơ cấp</span>
                 </div>
                 <div class="profile-dropdown-divider"></div>
                 <button class="profile-dropdown-logout" onclick="handleLogout()">🚪 Đăng xuất</button>

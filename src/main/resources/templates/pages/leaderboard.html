@@ -3,28 +3,28 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 <head>
-    <title>Bang xep hang - K-Learn</title>
+    <title>Bảng xếp hạng - K-Learn</title>
 </head>
 <body>
 <div layout:fragment="content">
     <section class="page active" id="page-leaderboard">
         <div class="page-header">
-            <h2 class="page-title">Bang xep hang</h2>
+            <h2 class="page-title">Bảng xếp hạng</h2>
         </div>
 
         <div class="exercise-container">
             <div th:if="${entries == null || #lists.isEmpty(entries)}" style="color:#64748b;">
-                Chua co du lieu bang xep hang.
+                Chưa có dữ liệu bảng xếp hạng.
             </div>
 
             <div th:if="${entries != null && !#lists.isEmpty(entries)}" style="overflow-x:auto;">
                 <table style="width:100%; border-collapse:collapse;">
                     <thead>
                     <tr>
-                        <th style="text-align:left; padding:12px;">Hang</th>
-                        <th style="text-align:left; padding:12px;">Nguoi hoc</th>
-                        <th style="text-align:left; padding:12px;">Cap do</th>
-                        <th style="text-align:right; padding:12px;">Tong XP</th>
+                        <th style="text-align:left; padding:12px;">Hạng</th>
+                        <th style="text-align:left; padding:12px;">Người học</th>
+                        <th style="text-align:left; padding:12px;">Cấp độ</th>
+                        <th style="text-align:right; padding:12px;">Tổng XP</th>
                         <th style="text-align:right; padding:12px;">Streak</th>
                     </tr>
                     </thead>

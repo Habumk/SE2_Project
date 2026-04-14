@@ -3,6 +3,7 @@ package com.klearn.config;
 import com.klearn.security.UserDetailsImpl;
 import com.klearn.service.AuthService;
 import com.klearn.service.StreakService;
+import com.klearn.service.XpService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,7 +22,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                             StreakService streakService,
-                                            AuthService authService) throws Exception {
+                                            AuthService authService,
+                                            XpService xpService) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
@@ -47,6 +49,11 @@ public class SecurityConfig {
 
                     // UC-01 step 6: checkAndUpdate streak
                     streakService.updateStreak(userId);
+
+                    // Recalculate XP and level from completed lessons
+                    System.out.println("DEBUG: Login success handler - recalculating stats for user " + userId);
+                    xpService.recalculateUserStats(userId);
+                    System.out.println("DEBUG: Login success handler - stats recalculated");
 
                     response.sendRedirect("/dashboard");
                 })

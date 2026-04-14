@@ -51,7 +51,6 @@ public class PageController {
         model.addAttribute("grammarLessons", grammarLessonRepository.findAll());
         return "pages/grammar";
     }
-
     @GetMapping("/speaking")
     public String speaking(Authentication auth, Model model) {
         addUserToModel(auth, model);
@@ -99,6 +98,13 @@ public class PageController {
         addUserToModel(auth, model);
         model.addAttribute("currentPage", "roadmap");
         return "pages/roadmap";
+    }
+
+    @GetMapping("/test-leaderboard")
+    public String testLeaderboard(Authentication auth, Model model) {
+        addUserToModel(auth, model);
+        model.addAttribute("currentPage", "test-leaderboard");
+        return "pages/test-leaderboard";
     }
 
     /**
