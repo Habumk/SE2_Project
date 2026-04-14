@@ -16,7 +16,7 @@
         <div class="exercise-container" style="display:grid; gap:24px;">
             <div th:if="${#lists.isEmpty(readingPassages)}" class="card"
                  style="padding:24px; border-radius:20px; background:#fff; color:#64748b;">
-                Chua co bai doc cho lesson nay.
+                Chưa có bài đọc cho bài học này.
             </div>
 
             <article th:each="passage, passageStat : ${readingPassages}"

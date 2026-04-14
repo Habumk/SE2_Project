@@ -32,11 +32,11 @@
                              style="padding:20px; border-radius:18px; background:#f8fafc; border:1px solid #e2e8f0; text-align:center;">
                             <div id="writingTargetChar" style="font-size:64px; font-weight:800; margin-bottom:10px;">-</div>
                             <div id="writingTargetInfo" style="color:#ef4444; font-weight:700; margin-bottom:14px;">-</div>
-                            <button type="button" class="btn btn-primary" id="writingSpeakBtn">Nghe mau</button>
+                            <button type="button" class="btn btn-primary" id="writingSpeakBtn">Nghe mẫu</button>
                         </div>
 
                         <div th:if="${#lists.isEmpty(writingChars)}" style="color:#64748b;">
-                            Chua co bai viet ky tu.
+                            Chưa có bài viết.
                         </div>
 
                         <div th:unless="${#lists.isEmpty(writingChars)}" style="display:grid; gap:10px;">
@@ -164,7 +164,7 @@
 
                     result.style.background = '#fffbeb';
                     result.style.color = '#b45309';
-                    result.textContent = `Chua dung. Dap an mau: ${expected}`;
+                    result.textContent = `Chưa đúng. Đáp án mẫu: ${expected}`;
                 });
             });
         });

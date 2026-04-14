@@ -10,12 +10,11 @@
     <section class="page active" id="page-hangul">
         <div class="page-header">
             <h2 class="page-title">Bang chu Hangul</h2>
-            <p class="page-subtitle">Du lieu duoc render truc tiep bang Thymeleaf thay vi JS render toan bo</p>
         </div>
 
         <div class="exercise-container" style="display:grid; gap:24px;">
             <section class="card" style="padding:20px; border-radius:18px; background:#fff;">
-                <h3 class="section-title">Phu am</h3>
+                <h3 class="section-title">Phụ âm</h3>
                 <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:16px;">
                     <div th:each="item : ${consonants}" style="padding:16px; border:1px solid #e5e7eb; border-radius:16px;">
                         <div style="font-size:34px; font-weight:800;" th:text="${item.charValue}">g</div>
@@ -27,7 +26,7 @@
             </section>
 
             <section class="card" style="padding:20px; border-radius:18px; background:#fff;">
-                <h3 class="section-title">Nguyen am</h3>
+                <h3 class="section-title">Nguyên âm</h3>
                 <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:16px;">
                     <div th:each="item : ${vowels}" style="padding:16px; border:1px solid #e5e7eb; border-radius:16px;">
                         <div style="font-size:34px; font-weight:800;" th:text="${item.charValue}">a</div>
@@ -39,7 +38,7 @@
             </section>
 
             <section class="card" style="padding:20px; border-radius:18px; background:#fff;">
-                <h3 class="section-title">Phu am doi</h3>
+                <h3 class="section-title">Phụ âm đôi</h3>
                 <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:16px;">
                     <div th:each="item : ${doubleConsonants}" style="padding:16px; border:1px solid #e5e7eb; border-radius:16px;">
                         <div style="font-size:34px; font-weight:800;" th:text="${item.charValue}">kk</div>
@@ -51,7 +50,7 @@
             </section>
 
             <section class="card" style="padding:20px; border-radius:18px; background:#fff;">
-                <h3 class="section-title">Nguyen am ghep</h3>
+                <h3 class="section-title">Nguyên âm ghép</h3>
                 <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:16px;">
                     <div th:each="item : ${compoundVowels}" style="padding:16px; border:1px solid #e5e7eb; border-radius:16px;">
                         <div style="font-size:34px; font-weight:800;" th:text="${item.charValue}">wa</div>

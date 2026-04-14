@@ -1,5 +1,6 @@
 package com.klearn.service;
 
+import com.klearn.exception.ResourceNotFoundException;
 import com.klearn.model.Course;
 import com.klearn.model.Lesson;
 import com.klearn.model.UserProgress;
@@ -7,6 +8,7 @@ import com.klearn.repository.CourseRepository;
 import com.klearn.repository.LessonRepository;
 import com.klearn.repository.UserProgressRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -18,6 +20,7 @@ import java.util.Map;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CourseService {
 
     private final CourseRepository courseRepository;
@@ -25,11 +28,14 @@ public class CourseService {
     private final UserProgressRepository userProgressRepository;
 
     public List<Course> getAllCourses() {
+        log.debug("Fetching all courses");
         return courseRepository.findAll();
     }
 
     public Course getCourseById(Long id) {
-        return courseRepository.findById(id).orElse(null);
+        log.debug("Fetching course with id: {}", id);
+        return courseRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Course", id.toString()));
     }
 
     public List<Lesson> getLessonsByCourse(Long courseId) {

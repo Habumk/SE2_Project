@@ -2,6 +2,7 @@ package com.klearn.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.klearn.exception.ResourceNotFoundException;
 import com.klearn.model.Exercise;
 import com.klearn.model.Lesson;
 import com.klearn.model.LessonResult;
@@ -15,6 +16,7 @@ import com.klearn.service.LessonReviewService;
 import com.klearn.repository.LessonResultRepository;
 import com.klearn.repository.UserProgressRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/lessons")
 @RequiredArgsConstructor
+@Slf4j
 public class LessonController {
 
     private final LessonService lessonService;
@@ -48,80 +51,100 @@ public class LessonController {
     public String viewLessonPlayer(@PathVariable Long id, Model model,
                                    @AuthenticationPrincipal UserDetailsImpl user,
                                    Authentication auth) {
-        Lesson lesson = lessonService.getLessonById(id);
-        if (lesson == null) return "redirect:/courses";
+        log.debug("Loading lesson player for lesson: {}", id);
+        try {
+            Lesson lesson = lessonService.getLessonById(id);
+            addUserToModel(auth, model);
+            model.addAttribute("lesson", lesson);
+            model.addAttribute("theory", lessonService.getTheoryByLesson(id));
+            model.addAttribute("vocabularies", lessonService.getVocabulariesByLesson(id));
+            model.addAttribute("currentPage", "courses");
 
-        addUserToModel(auth, model);
-        model.addAttribute("lesson", lesson);
-        model.addAttribute("theory", lessonService.getTheoryByLesson(id));
-        model.addAttribute("vocabularies", lessonService.getVocabulariesByLesson(id));
-        model.addAttribute("currentPage", "courses");
+            if (user != null) {
+                model.addAttribute("currentUserId", user.getUserId());
+            }
 
-        if (user != null) {
-            model.addAttribute("currentUserId", user.getUserId());
+            return "lessons/player";
+        } catch (ResourceNotFoundException e) {
+            log.warn("Lesson not found: {}", id);
+            return "redirect:/courses";
         }
-
-        return "lessons/player";
     }
 
     // ================= LISTENING =================
     @GetMapping("/{id}/listening")
     @Transactional(readOnly = true)
     public String viewListening(@PathVariable Long id, Model model, Authentication auth) {
-        Lesson lesson = lessonService.getLessonById(id);
-        if (lesson == null) return "redirect:/courses";
+        log.debug("Loading listening exercises for lesson: {}", id);
+        try {
+            Lesson lesson = lessonService.getLessonById(id);
+            addUserToModel(auth, model);
+            model.addAttribute("lesson", lesson);
+            model.addAttribute("listeningExercises",
+                    lessonService.getExercisesByLessonAndType(id, Exercise.ExerciseType.listening));
+            model.addAttribute("currentPage", "courses");
 
-        addUserToModel(auth, model);
-        model.addAttribute("lesson", lesson);
-        model.addAttribute("listeningExercises",
-                lessonService.getExercisesByLessonAndType(id, Exercise.ExerciseType.listening));
-        model.addAttribute("currentPage", "courses");
-
-        return "pages/listening";
+            return "pages/listening";
+        } catch (ResourceNotFoundException e) {
+            log.warn("Lesson not found: {}", id);
+            return "redirect:/courses";
+        }
     }
 
     // ================= SPEAKING =================
     @GetMapping("/{id}/speaking")
     public String viewSpeaking(@PathVariable Long id, Model model, Authentication auth) {
-        Lesson lesson = lessonService.getLessonById(id);
-        if (lesson == null) return "redirect:/courses";
+        log.debug("Loading speaking exercises for lesson: {}", id);
+        try {
+            Lesson lesson = lessonService.getLessonById(id);
+            addUserToModel(auth, model);
+            model.addAttribute("lesson", lesson);
+            model.addAttribute("speakingPrompts", lessonService.getSpeakingPromptsByLesson(id));
+            model.addAttribute("currentPage", "courses");
 
-        addUserToModel(auth, model);
-        model.addAttribute("lesson", lesson);
-        model.addAttribute("speakingPrompts", lessonService.getSpeakingPromptsByLesson(id));
-        model.addAttribute("currentPage", "courses");
-
-        return "pages/speaking";
+            return "pages/speaking";
+        } catch (ResourceNotFoundException e) {
+            log.warn("Lesson not found: {}", id);
+            return "redirect:/courses";
+        }
     }
 
     // ================= READING =================
     @GetMapping("/{id}/reading")
     public String viewReading(@PathVariable Long id, Model model, Authentication auth) {
-        Lesson lesson = lessonService.getLessonById(id);
-        if (lesson == null) return "redirect:/courses";
+        log.debug("Loading reading exercises for lesson: {}", id);
+        try {
+            Lesson lesson = lessonService.getLessonById(id);
+            addUserToModel(auth, model);
+            model.addAttribute("lesson", lesson);
+            model.addAttribute("readingPassages", lessonService.getReadingPassagesByLesson(id));
+            model.addAttribute("readingQuestionsByPassage", buildReadingQuestions(id));
+            model.addAttribute("currentPage", "courses");
 
-        addUserToModel(auth, model);
-        model.addAttribute("lesson", lesson);
-        model.addAttribute("readingPassages", lessonService.getReadingPassagesByLesson(id));
-        model.addAttribute("readingQuestionsByPassage", buildReadingQuestions(id));
-        model.addAttribute("currentPage", "courses");
-
-        return "pages/reading";
+            return "pages/reading";
+        } catch (ResourceNotFoundException e) {
+            log.warn("Lesson not found: {}", id);
+            return "redirect:/courses";
+        }
     }
 
     // ================= WRITING =================
     @GetMapping("/{id}/writing")
     public String viewWriting(@PathVariable Long id, Model model, Authentication auth) {
-        Lesson lesson = lessonService.getLessonById(id);
-        if (lesson == null) return "redirect:/courses";
+        log.debug("Loading writing exercises for lesson: {}", id);
+        try {
+            Lesson lesson = lessonService.getLessonById(id);
+            addUserToModel(auth, model);
+            model.addAttribute("lesson", lesson);
+            model.addAttribute("writingChars", lessonService.getWritingCharExercisesByLesson(id));
+            model.addAttribute("writingTranslations", lessonService.getWritingTranslateExercisesByLesson(id));
+            model.addAttribute("currentPage", "courses");
 
-        addUserToModel(auth, model);
-        model.addAttribute("lesson", lesson);
-        model.addAttribute("writingChars", lessonService.getWritingCharExercisesByLesson(id));
-        model.addAttribute("writingTranslations", lessonService.getWritingTranslateExercisesByLesson(id));
-        model.addAttribute("currentPage", "courses");
-
-        return "pages/writing";
+            return "pages/writing";
+        } catch (ResourceNotFoundException e) {
+            log.warn("Lesson not found: {}", id);
+            return "redirect:/courses";
+        }
     }
 
     // ================= REVIEW =================
@@ -129,47 +152,55 @@ public class LessonController {
     public String viewLessonReview(@PathVariable Long id, Model model,
                                    @AuthenticationPrincipal UserDetailsImpl user,
                                    Authentication auth) {
-        Lesson lesson = lessonService.getLessonById(id);
-        if (lesson == null) return "redirect:/courses";
+        log.debug("Loading review for lesson: {}", id);
+        try {
+            Lesson lesson = lessonService.getLessonById(id);
+            addUserToModel(auth, model);
+            model.addAttribute("lesson", lesson);
+            model.addAttribute("currentPage", "courses");
 
-        addUserToModel(auth, model);
-        model.addAttribute("lesson", lesson);
-        model.addAttribute("currentPage", "courses");
+            if (user != null) {
+                Long userId = user.getUserId();
 
-        if (user != null) {
-            Long userId = user.getUserId();
+                LessonResult result = lessonResultRepository
+                        .findByUser_UserIdAndLesson_LessonId(userId, id)
+                        .orElse(null);
 
-            LessonResult result = lessonResultRepository
-                    .findByUser_UserIdAndLesson_LessonId(userId, id)
-                    .orElse(null);
+                model.addAttribute("lessonResult", result);
+                List<com.klearn.dto.WrongAnswerDto> wrongAnswers = lessonReviewService.getWrongAnswers(id, userId);
+                Map<String, List<com.klearn.dto.WrongAnswerDto>> wrongAnswersByType = wrongAnswers.stream()
+                        .collect(Collectors.groupingBy(
+                                answer -> answer.getExerciseType() != null ? answer.getExerciseType() : "unknown",
+                                java.util.LinkedHashMap::new,
+                                Collectors.toList()
+                        ));
 
-            model.addAttribute("lessonResult", result);
-            List<com.klearn.dto.WrongAnswerDto> wrongAnswers = lessonReviewService.getWrongAnswers(id, userId);
-            Map<String, List<com.klearn.dto.WrongAnswerDto>> wrongAnswersByType = wrongAnswers.stream()
-                    .collect(Collectors.groupingBy(
-                            answer -> answer.getExerciseType() != null ? answer.getExerciseType() : "unknown",
-                            java.util.LinkedHashMap::new,
-                            Collectors.toList()
-                    ));
+                model.addAttribute("wrongAnswers", wrongAnswers);
+                model.addAttribute("wrongAnswersByType", wrongAnswersByType);
+            }
 
-            model.addAttribute("wrongAnswers", wrongAnswers);
-            model.addAttribute("wrongAnswersByType", wrongAnswersByType);
+            return "lessons/review";
+        } catch (ResourceNotFoundException e) {
+            log.warn("Lesson not found: {}", id);
+            return "redirect:/courses";
         }
-
-        return "lessons/review";
     }
 
     // ================= FLASHCARD =================
     @GetMapping("/{id}/flashcard")
     public String viewLessonFlashcard(@PathVariable Long id, Model model, Authentication auth) {
-        Lesson lesson = lessonService.getLessonById(id);
-        if (lesson == null) return "redirect:/courses";
+        log.debug("Loading flashcard for lesson: {}", id);
+        try {
+            Lesson lesson = lessonService.getLessonById(id);
+            addUserToModel(auth, model);
+            model.addAttribute("lesson", lesson);
+            model.addAttribute("currentPage", "courses");
 
-        addUserToModel(auth, model);
-        model.addAttribute("lesson", lesson);
-        model.addAttribute("currentPage", "courses");
-
-        return "lessons/flashcard";
+            return "lessons/flashcard";
+        } catch (ResourceNotFoundException e) {
+            log.warn("Lesson not found: {}", id);
+            return "redirect:/courses";
+        }
     }
 
     private Map<Long, List<Map<String, Object>>> buildReadingQuestions(Long lessonId) {

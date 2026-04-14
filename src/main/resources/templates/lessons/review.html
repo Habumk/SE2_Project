@@ -10,14 +10,13 @@
     <section class="page active" id="page-lesson-review">
         <div class="page-header">
             <h2 class="page-title" th:text="${lesson.title}">Lesson</h2>
-            <p class="page-subtitle">Trang review nay duoc render truc tiep bang Thymeleaf</p>
         </div>
 
         <section class="exercise-container" style="display:grid; gap:20px;">
             <div th:if="${lessonResult != null}" class="card" style="padding:20px; border-radius:18px; background:#fff;">
                 <h3 class="section-title">Ket qua lesson</h3>
                 <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                    <span class="status-badge status-completed">Tong diem: <span th:text="${lessonResult.totalScore}">0</span></span>
+                    <span class="status-badge status-completed">Tổng điểm: <span th:text="${lessonResult.totalScore}">0</span></span>
                     <span class="status-badge status-in-progress">XP: <span th:text="${lessonResult.xpEarned}">0</span></span>
                     <span class="status-badge status-not-started">Listening: <span th:text="${lessonResult.listeningScore}">0</span></span>
                     <span class="status-badge status-not-started">Reading: <span th:text="${lessonResult.readingScore}">0</span></span>
@@ -28,7 +27,7 @@
 
             <div th:if="${wrongAnswersByType == null || wrongAnswersByType.isEmpty()}" class="card"
                  style="padding:20px; border-radius:18px; background:#fff; color:#64748b;">
-                Khong co cau tra loi sai nao can xem lai.
+                Không có câu trả lời sai nào cần xem lại.
             </div>
 
             <div th:each="entry : ${wrongAnswersByType}" class="card"
@@ -39,13 +38,13 @@
 
                     <div th:if="${item.exerciseType == 'speaking'}" style="display:grid; gap:6px; color:#475569;">
                         <div>Expected: <span th:text="${item.expectedText}">expected</span></div>
-                        <div>Ban da noi: <span th:text="${item.sttResult}">result</span></div>
-                        <div>Diem: <span th:text="${item.pronunciationScore}">0</span></div>
+                        <div>Bạn đã nói: <span th:text="${item.sttResult}">result</span></div>
+                        <div>Điểm: <span th:text="${item.pronunciationScore}">0</span></div>
                     </div>
 
                     <div th:if="${item.exerciseType != 'speaking'}" style="display:grid; gap:6px; color:#475569;">
-                        <div>Ban chon: <span th:text="${item.selectedAnswer}">selected</span></div>
-                        <div>Dap an dung: <span th:text="${item.correctAnswer}">correct</span></div>
+                        <div>Bạn chọn: <span th:text="${item.selectedAnswer}">selected</span></div>
+                        <div>Đáp án đúng: <span th:text="${item.correctAnswer}">correct</span></div>
                     </div>
 
                     <div th:if="${item.explanation != null && !item.explanation.isBlank()}"
